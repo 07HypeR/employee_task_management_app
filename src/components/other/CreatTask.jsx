@@ -48,15 +48,15 @@ const CreatTask = () => {
 
   return (
     <div className="mt-8">
-      <div className="bg-[#111111]/60 backdrop-blur-2xl p-8 rounded-[2.5rem] border border-emerald-500/10 shadow-2xl relative overflow-hidden group">
+      <div className="bg-[#111111]/60 backdrop-blur-2xl p-6 sm:p-8 rounded-[2rem] sm:rounded-[2.5rem] border border-emerald-500/10 shadow-2xl relative overflow-hidden group">
         <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-emerald-500/10 to-transparent blur-3xl -mr-16 -mt-16 group-hover:opacity-100 opacity-50 transition-opacity duration-500" />
 
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold tracking-tight mb-1">
+            <h2 className="text-xl sm:text-2xl font-bold tracking-tight mb-1">
               Create New Task
             </h2>
-            <p className="text-slate-500 text-sm font-medium">
+            <p className="text-slate-500 text-xs sm:text-sm font-medium">
               Assign work to your team members
             </p>
           </div>
@@ -69,15 +69,15 @@ const CreatTask = () => {
 
         <form
           onSubmit={submitHandler}
-          className="grid grid-cols-1 lg:grid-cols-2 gap-8"
+          className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8"
         >
-          <div className="space-y-5">
+          <div className="space-y-4 sm:space-y-5">
             <div className="space-y-2">
               <label className="text-[10px] font-bold text-emerald-500/60 uppercase tracking-widest ml-4">
                 Task Title
               </label>
               <input
-                className="w-full h-14 outline-none bg-black/20 border border-emerald-500/10 text-white px-6 rounded-2xl placeholder:text-slate-600 focus:border-emerald-500/40 focus:bg-black/40 transition-all duration-300"
+                className="w-full h-12 sm:h-14 outline-none bg-black/20 border border-emerald-500/10 text-white px-5 sm:px-6 rounded-xl sm:rounded-2xl placeholder:text-slate-600 focus:border-emerald-500/40 focus:bg-black/40 transition-all duration-300 text-sm sm:text-base"
                 type="text"
                 placeholder="e.g. Design homepage banner"
                 value={taskTitle}
@@ -86,13 +86,13 @@ const CreatTask = () => {
               />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
               <div className="space-y-2">
                 <label className="text-[10px] font-bold text-emerald-500/60 uppercase tracking-widest ml-4">
                   Date
                 </label>
                 <input
-                  className="w-full h-14 outline-none bg-black/20 border border-emerald-500/10 text-white px-6 rounded-2xl focus:border-emerald-500/40 focus:bg-black/40 transition-all duration-300 [color-scheme:dark]"
+                  className="w-full h-12 sm:h-14 outline-none bg-black/20 border border-emerald-500/10 text-white px-5 sm:px-6 rounded-xl sm:rounded-2xl focus:border-emerald-500/40 focus:bg-black/40 transition-all duration-300 [color-scheme:dark] text-sm sm:text-base"
                   type="date"
                   value={taskDate}
                   onChange={(e) => setTaskDate(e.target.value)}
@@ -104,7 +104,7 @@ const CreatTask = () => {
                   Assign To
                 </label>
                 <input
-                  className="w-full h-14 outline-none bg-black/20 border border-emerald-500/10 text-white px-6 rounded-2xl placeholder:text-slate-600 focus:border-emerald-500/40 focus:bg-black/40 transition-all duration-300"
+                  className="w-full h-12 sm:h-14 outline-none bg-black/20 border border-emerald-500/10 text-white px-5 sm:px-6 rounded-xl sm:rounded-2xl placeholder:text-slate-600 focus:border-emerald-500/40 focus:bg-black/40 transition-all duration-300 text-sm sm:text-base"
                   type="text"
                   placeholder="Employee Name"
                   value={assignTo}
@@ -119,7 +119,7 @@ const CreatTask = () => {
                 Category
               </label>
               <input
-                className="w-full h-14 outline-none bg-black/20 border border-emerald-500/10 text-white px-6 rounded-2xl placeholder:text-slate-600 focus:border-emerald-500/40 focus:bg-black/40 transition-all duration-300"
+                className="w-full h-12 sm:h-14 outline-none bg-black/20 border border-emerald-500/10 text-white px-5 sm:px-6 rounded-xl sm:rounded-2xl placeholder:text-slate-600 focus:border-emerald-500/40 focus:bg-black/40 transition-all duration-300 text-sm sm:text-base"
                 type="text"
                 placeholder="Design, Dev, etc..."
                 value={category}
@@ -135,14 +135,14 @@ const CreatTask = () => {
                 Description
               </label>
               <textarea
-                className="w-full h-[188px] outline-none bg-black/20 border border-emerald-500/10 text-white p-6 rounded-2xl placeholder:text-slate-600 focus:border-emerald-500/40 focus:bg-black/40 transition-all duration-300 resize-none"
+                className="w-full h-[150px] sm:h-[188px] outline-none bg-black/20 border border-emerald-500/10 text-white p-5 sm:p-6 rounded-xl sm:rounded-2xl placeholder:text-slate-600 focus:border-emerald-500/40 focus:bg-black/40 transition-all duration-300 resize-none text-sm sm:text-base"
                 placeholder="Detailed task instructions..."
                 value={taskDescription}
                 onChange={(e) => setTaskDescription(e.target.value)}
                 required
               />
             </div>
-            <button className="mt-8 w-full h-14 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-2xl transition-all duration-300 shadow-lg shadow-emerald-500/20 active:scale-[0.98] cursor-pointer">
+            <button className="mt-6 sm:mt-8 w-full h-12 sm:h-14 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl sm:rounded-2xl transition-all duration-300 shadow-lg shadow-emerald-500/20 active:scale-[0.98] cursor-pointer text-sm sm:text-base">
               Create Task
             </button>
           </div>

@@ -1,0 +1,184 @@
+import React from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { AuthContext } from "../../context/AuthProvider";
+
+const Register = () => {
+  const [formData, setFormData] = React.useState({
+    fname: "",
+    lname: "",
+    email: "",
+    password: "",
+    role: "employee",
+  });
+  const [error, setError] = React.useState("");
+  const { registerUser } = React.useContext(AuthContext);
+  const navigate = useNavigate();
+
+  React.useEffect(() => {
+    const loggedInUser = localStorage.getItem("loggedInUser");
+    if (loggedInUser) {
+      navigate("/");
+    }
+  }, [navigate]);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setError("");
+  };
+
+  const submitHandler = (e) => {
+    e.preventDefault();
+    if (
+      !formData.fname ||
+      !formData.lname ||
+      !formData.email ||
+      !formData.password
+    ) {
+      setError("Please fill in all fields.");
+      return;
+    }
+
+    const success = registerUser(formData);
+    if (success) {
+      alert("Registration successful! Please log in.");
+      navigate("/");
+    } else {
+      setError("Registration failed. Please try again.");
+    }
+  };
+
+  return (
+    <div className="flex flex-col min-h-screen w-screen items-center justify-center bg-[#1c1c1c] relative overflow-y-auto overflow-x-hidden py-10 scroll-smooth">
+      {/* Background Atmosphere */}
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-600/10 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-emerald-500/5 blur-[120px] rounded-full pointer-events-none" />
+
+      <div className="relative z-10 w-full max-w-md px-4 sm:px-6">
+        <div className="bg-[#111111]/80 backdrop-blur-2xl rounded-[2rem] sm:rounded-[2.5rem] border border-emerald-500/10 p-8 sm:p-10 shadow-2xl overflow-hidden group hover:border-emerald-500/20 transition-all duration-500">
+          <div className="absolute top-0 right-0 w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-emerald-500/10 to-transparent blur-3xl -mr-12 -mt-12 sm:-mr-16 sm:-mt-16 group-hover:opacity-100 opacity-50 transition-opacity duration-500" />
+
+          <div className="text-center mb-6 sm:mb-8">
+            <h1 className="text-[10px] sm:text-xs font-bold text-emerald-500 uppercase tracking-[0.3em] mb-3">
+              Join Our Team
+            </h1>
+            <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-white mb-2">
+              Create{" "}
+              <span className="bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text text-transparent">
+                Account
+              </span>
+            </h2>
+          </div>
+
+          {error && (
+            <div className="mb-6 p-4 bg-rose-500/10 border border-rose-500/30 rounded-2xl animate-shake">
+              <p className="text-rose-400 text-xs sm:text-sm font-semibold text-center">
+                {error}
+              </p>
+            </div>
+          )}
+
+          <form onSubmit={submitHandler} className="flex flex-col gap-4">
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="space-y-2 flex-1">
+                <label className="text-[10px] font-bold text-emerald-500/60 uppercase tracking-widest ml-4">
+                  First Name
+                </label>
+                <input
+                  name="fname"
+                  value={formData.fname}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full h-12 sm:h-14 outline-none bg-black/20 border border-emerald-500/10 text-white px-5 sm:px-6 rounded-xl sm:rounded-2xl placeholder:text-slate-600 focus:border-emerald-500/40 focus:bg-black/40 transition-all duration-300 text-sm sm:text-base"
+                  type="text"
+                  placeholder="John"
+                />
+              </div>
+              <div className="space-y-2 flex-1">
+                <label className="text-[10px] font-bold text-emerald-500/60 uppercase tracking-widest ml-4">
+                  Last Name
+                </label>
+                <input
+                  name="lname"
+                  value={formData.lname}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full h-12 sm:h-14 outline-none bg-black/20 border border-emerald-500/10 text-white px-5 sm:px-6 rounded-xl sm:rounded-2xl placeholder:text-slate-600 focus:border-emerald-500/40 focus:bg-black/40 transition-all duration-300 text-sm sm:text-base"
+                  type="text"
+                  placeholder="Doe"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold text-emerald-500/60 uppercase tracking-widest ml-4">
+                Role Selection
+              </label>
+              <select
+                name="role"
+                value={formData.role}
+                onChange={handleInputChange}
+                className="w-full h-12 sm:h-14 outline-none bg-black/20 border border-emerald-500/10 text-white px-5 sm:px-6 rounded-xl sm:rounded-2xl focus:border-emerald-500/40 focus:bg-black/40 transition-all duration-300 appearance-none cursor-pointer text-sm sm:text-base"
+              >
+                <option value="employee" className="bg-[#1c1c1c]">
+                  Employee
+                </option>
+                <option value="admin" className="bg-[#1c1c1c]">
+                  Admin
+                </option>
+              </select>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold text-emerald-500/60 uppercase tracking-widest ml-4">
+                Email Address
+              </label>
+              <input
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                required
+                className="w-full h-12 sm:h-14 outline-none bg-black/20 border border-emerald-500/10 text-white px-5 sm:px-6 rounded-xl sm:rounded-2xl placeholder:text-slate-600 focus:border-emerald-500/40 focus:bg-black/40 transition-all duration-300 text-sm sm:text-base"
+                type="email"
+                placeholder="email@example.com"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold text-emerald-500/60 uppercase tracking-widest ml-4">
+                Password
+              </label>
+              <input
+                name="password"
+                value={formData.password}
+                onChange={handleInputChange}
+                required
+                className="w-full h-12 sm:h-14 outline-none bg-black/20 border border-emerald-500/10 text-white px-5 sm:px-6 rounded-xl sm:rounded-2xl placeholder:text-slate-600 focus:border-emerald-500/40 focus:bg-black/40 transition-all duration-300 text-sm sm:text-base"
+                type="password"
+                placeholder="••••••••"
+              />
+            </div>
+
+            <button className="mt-4 sm:mt-6 bg-emerald-600 hover:bg-emerald-500 text-white font-bold h-12 sm:h-14 px-6 rounded-xl sm:rounded-2xl transition-all duration-300 shadow-lg shadow-emerald-500/20 active:scale-[0.98] cursor-pointer text-sm sm:text-base">
+              Create Account
+            </button>
+
+            <div className="mt-4 text-center">
+              <div className="text-[10px] sm:text-xs font-medium text-slate-600 uppercase tracking-wider">
+                Already have an account?{" "}
+                <Link
+                  to="/"
+                  className="text-emerald-500 font-bold hover:text-emerald-400 transition-colors duration-300"
+                >
+                  Log In
+                </Link>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Register;

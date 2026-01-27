@@ -1,6 +1,25 @@
-import React from "react";
+import React, { useContext } from "react";
+import { AuthContext } from "../../context/AuthProvider";
 
 const AcceptTask = ({ data }) => {
+  const { updateTaskStatus } = useContext(AuthContext);
+
+  // Get logged in user email to identify who owns the task
+  const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
+  const userEmail = loggedInUser?.data.email;
+
+  const handleComplete = () => {
+    if (userEmail) {
+      updateTaskStatus(userEmail, data.title, "completed");
+    }
+  };
+
+  const handleFailed = () => {
+    if (userEmail) {
+      updateTaskStatus(userEmail, data.title, "failed");
+    }
+  };
+
   return (
     <div className="h-full p-6 bg-white/5 backdrop-blur-2xl rounded-3xl border border-white/10 bg-amber-500/10 hover:bg-amber-500/[0.15] transition-all duration-300">
       <div className="flex justify-between items-center mb-4">
@@ -14,10 +33,16 @@ const AcceptTask = ({ data }) => {
         {data.description}
       </p>
       <div className="mt-auto flex gap-3">
-        <button className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl transition-colors duration-300 shadow-lg shadow-emerald-600/20">
+        <button
+          onClick={handleComplete}
+          className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl transition-colors duration-300 shadow-lg shadow-emerald-600/20"
+        >
           Complete
         </button>
-        <button className="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-semibold py-2.5 rounded-xl transition-colors duration-300 shadow-lg shadow-rose-600/20">
+        <button
+          onClick={handleFailed}
+          className="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-semibold py-2.5 rounded-xl transition-colors duration-300 shadow-lg shadow-rose-600/20"
+        >
           Failed
         </button>
       </div>

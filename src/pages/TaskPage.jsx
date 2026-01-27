@@ -70,7 +70,7 @@ const TaskPage = ({ changeUser }) => {
   };
 
   return (
-    <div className="min-h-screen bg-[#1c1c1c] p-6 sm:p-10 relative overflow-hidden selection:bg-emerald-500/30">
+    <div className="min-h-screen bg-[#1c1c1c] p-4 sm:p-10 relative overflow-hidden selection:bg-emerald-500/30">
       <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-600/5 blur-[120px] rounded-full" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-emerald-500/5 blur-[120px] rounded-full" />
 

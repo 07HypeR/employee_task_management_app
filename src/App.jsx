@@ -1,5 +1,6 @@
-import React, { useContext, useEffect, useState } from "react";
+import React from "react";
 import Login from "./components/Auth/Login";
+import Register from "./components/Auth/Register";
 import EmployeeDashboard from "./components/Dashboard/EmployeeDashboard";
 import AdminDashboard from "./components/Dashboard/AdminDashboard";
 import { AuthContext } from "./context/AuthProvider";
@@ -7,12 +8,12 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import TaskPage from "./pages/TaskPage";
 
 const App = () => {
-  const [user, setUser] = useState(null);
-  const [loggedInUser, setLoggedInUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const authData = useContext(AuthContext);
+  const [user, setUser] = React.useState(null);
+  const [loggedInUser, setLoggedInUser] = React.useState(null);
+  const [loading, setLoading] = React.useState(true);
+  const authData = React.useContext(AuthContext);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const loggedInUser = localStorage.getItem("loggedInUser");
     if (loggedInUser) {
       const userData = JSON.parse(loggedInUser);
@@ -27,7 +28,7 @@ const App = () => {
   }, []);
 
   // Sync logged-in user with context updates (when tasks are added/updated)
-  useEffect(() => {
+  React.useEffect(() => {
     if (!authData || !user) return;
 
     const storedUser = localStorage.getItem("loggedInUser");
@@ -111,6 +112,7 @@ const App = () => {
           )
         }
       />
+      <Route path="/register" element={<Register />} />
     </Routes>
   );
 };

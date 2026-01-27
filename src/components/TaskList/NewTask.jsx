@@ -1,6 +1,25 @@
-import React from "react";
+import React, { useContext } from "react";
+import { AuthContext } from "../../context/AuthProvider";
 
 const NewTask = ({ data }) => {
+  const { updateTaskStatus } = useContext(AuthContext);
+
+  // Get logged in user email to identify who owns the task
+  const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
+  const userEmail = loggedInUser?.data.email;
+
+  const handleAccept = () => {
+    if (userEmail) {
+      updateTaskStatus(userEmail, data.title, "accepted");
+    }
+  };
+
+  const handleDecline = () => {
+    if (userEmail) {
+      updateTaskStatus(userEmail, data.title, "failed");
+    }
+  };
+
   return (
     <div className="h-full p-6 bg-[#111111]/80 backdrop-blur-2xl rounded-3xl border border-emerald-500/10 hover:border-emerald-500/20 transition-all duration-300">
       <div className="flex justify-between items-center mb-4">
@@ -14,11 +33,17 @@ const NewTask = ({ data }) => {
         {data.description}
       </p>
       <div className="mt-auto flex gap-3">
-        <button className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 rounded-xl transition-colors duration-300 shadow-lg shadow-emerald-600/20">
+        <button
+          onClick={handleAccept}
+          className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 rounded-xl transition-colors duration-300 shadow-lg shadow-emerald-600/20"
+        >
           Accept
         </button>
-        <button className="px-4 bg-[#1c1c1c] hover:bg-[#252525] text-slate-300 font-semibold py-2.5 rounded-xl transition-colors duration-300 border border-white/5">
-          Dismiss
+        <button
+          onClick={handleDecline}
+          className="px-4 bg-[#1c1c1c] hover:bg-[#252525] text-slate-300 font-semibold py-2.5 rounded-xl transition-colors duration-300 border border-white/5"
+        >
+          Decline
         </button>
       </div>
     </div>
