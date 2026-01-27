@@ -34,16 +34,18 @@ const TaskList = ({ data }) => {
       >
         {data.tasks.map((elem, idx) => {
           if (elem.active) {
-            return <AcceptTask key={idx} data={elem} />;
+            return (
+              <div key={idx} className="shrink-0 w-[320px]">
+                <AcceptTask data={elem} />
+              </div>
+            );
           }
           if (elem.newTask) {
-            return <NewTask key={idx} data={elem} />;
-          }
-          if (elem.completed) {
-            return <CompleteTask key={idx} data={elem} />;
-          }
-          if (elem.failed) {
-            return <FailedTask key={idx} data={elem} />;
+            return (
+              <div key={idx} className="shrink-0 w-[320px]">
+                <NewTask data={elem} />
+              </div>
+            );
           }
           return null;
         })}

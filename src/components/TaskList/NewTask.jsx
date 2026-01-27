@@ -2,7 +2,7 @@ import React from "react";
 
 const NewTask = ({ data }) => {
   return (
-    <div className="shrink-0 w-[320px] p-6 bg-[#111111]/80 backdrop-blur-2xl rounded-3xl border border-emerald-500/10 hover:border-emerald-500/20 transition-all duration-300">
+    <div className="h-full p-6 bg-[#111111]/80 backdrop-blur-2xl rounded-3xl border border-emerald-500/10 hover:border-emerald-500/20 transition-all duration-300">
       <div className="flex justify-between items-center mb-4">
         <span className="bg-emerald-500/10 text-emerald-500 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider border border-emerald-500/20">
           {data.category}

@@ -2,7 +2,7 @@ import React from "react";
 
 const AcceptTask = ({ data }) => {
   return (
-    <div className="shrink-0 w-[320px] p-6 bg-white/5 backdrop-blur-2xl rounded-3xl border border-white/10 bg-amber-500/10 hover:bg-amber-500/[0.15] transition-all duration-300">
+    <div className="h-full p-6 bg-white/5 backdrop-blur-2xl rounded-3xl border border-white/10 bg-amber-500/10 hover:bg-amber-500/[0.15] transition-all duration-300">
       <div className="flex justify-between items-center mb-4">
         <span className="bg-amber-500/20 text-amber-500 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider border border-amber-500/20">
           {data.category}

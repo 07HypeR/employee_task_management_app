@@ -2,15 +2,15 @@ import React, { useContext, useEffect, useState } from "react";
 import Login from "./components/Auth/Login";
 import EmployeeDashboard from "./components/Dashboard/EmployeeDashboard";
 import AdminDashboard from "./components/Dashboard/AdminDashboard";
-import { setLocalStorage } from "./utils/LocalStorage";
 import { AuthContext } from "./context/AuthProvider";
+import { Routes, Route, Navigate } from "react-router-dom";
+import TaskPage from "./pages/TaskPage";
 
 const App = () => {
   const [user, setUser] = useState(null);
   const [loggedInUser, setLoggedInUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const authData = useContext(AuthContext);
-  console.log(authData);
 
   useEffect(() => {
     const loggedInUser = localStorage.getItem("loggedInUser");
@@ -40,7 +40,6 @@ const App = () => {
         (emp) => emp.email === userData.data.email,
       );
       if (updatedEmployee) {
-        console.log("🔄 Syncing employee data:", updatedEmployee);
         setLoggedInUser(updatedEmployee);
         localStorage.setItem(
           "loggedInUser",
@@ -48,7 +47,7 @@ const App = () => {
         );
       }
     }
-  }, [authData?.employees, user]); // Watch authData.employees specifically
+  }, [authData?.employees, user]);
 
   const handleLogin = (email, password) => {
     if (
@@ -80,7 +79,7 @@ const App = () => {
         return true;
       }
     }
-    return false; // Invalid credentials
+    return false;
   };
 
   if (loading) {
@@ -88,14 +87,31 @@ const App = () => {
   }
 
   return (
-    <>
-      {!user ? <Login handleLogin={handleLogin} /> : ""}
-      {user === "admin" ? (
-        <AdminDashboard changeUser={setUser} data={loggedInUser} />
-      ) : user == "employee" ? (
-        <EmployeeDashboard changeUser={setUser} data={loggedInUser} />
-      ) : null}
-    </>
+    <Routes>
+      <Route
+        path="/"
+        element={
+          <>
+            {!user ? <Login handleLogin={handleLogin} /> : ""}
+            {user === "admin" ? (
+              <AdminDashboard changeUser={setUser} data={loggedInUser} />
+            ) : user == "employee" ? (
+              <EmployeeDashboard changeUser={setUser} data={loggedInUser} />
+            ) : null}
+          </>
+        }
+      />
+      <Route
+        path="/tasks/:type"
+        element={
+          user === "employee" ? (
+            <TaskPage changeUser={setUser} />
+          ) : (
+            <Navigate to="/" />
+          )
+        }
+      />
+    </Routes>
   );
 };
 
