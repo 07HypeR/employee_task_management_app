@@ -1,0 +1,22 @@
+import React from "react";
+import Header from "../other/Header";
+import TasklistNumber from "../other/TasklistNumber";
+import TaskList from "../TaskList/TaskList";
+
+const EmployeeDashboard = ({ data, changeUser }) => {
+  return (
+    <div className="min-h-screen bg-[#1c1c1c] p-6 sm:p-10 relative overflow-hidden selection:bg-emerald-500/30">
+      {/* Background Blobs for Atmosphere */}
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-600/5 blur-[120px] rounded-full" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-emerald-500/5 blur-[120px] rounded-full" />
+
+      <div className="relative z-10 max-w-7xl mx-auto">
+        <Header data={data} changeUser={changeUser} />
+        <TasklistNumber data={data} />
+        <TaskList data={data} />
+      </div>
+    </div>
+  );
+};
+
+export default EmployeeDashboard;
