@@ -1,9 +1,9 @@
-import React, { useContext, useState, useEffect } from "react";
-import { AuthContext } from "../../context/AuthProvider";
+import React, { useState, useEffect } from "react";
+import { useEmployees, useTasks } from "../../hooks/useApi";
 
 const CreatTask = () => {
-  const authContext = useContext(AuthContext);
-  const [employees, setEmployees] = useState([]);
+  const { employees, fetchEmployees } = useEmployees();
+  const { createTask } = useTasks();
   const [taskTitle, setTaskTitle] = useState("");
   const [taskDate, setTaskDate] = useState("");
   const [assignTo, setAssignTo] = useState("");
@@ -16,13 +16,6 @@ const CreatTask = () => {
     fetchEmployees();
   }, []);
 
-  const fetchEmployees = async () => {
-    try {
-      const employeesData = await authContext.getAllEmployees();
-      setEmployees(employeesData);
-    } catch (error) {}
-  };
-
   const submitHandler = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -34,10 +27,10 @@ const CreatTask = () => {
         description: taskDescription,
         date: taskDate,
         category,
-        assignedTo: assignTo, // This should be the employee's ID
+        assignedTo: assignTo,
       };
 
-      const result = await authContext.createTask(taskData);
+      const result = await createTask(taskData);
 
       if (result.success) {
         setMessage({ type: "success", text: "Task created successfully!" });

@@ -1,47 +1,40 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useEffect, useMemo } from "react";
 import Header from "../other/Header";
 import TasklistNumber from "../other/TasklistNumber";
 import TaskList from "../TaskList/TaskList";
 import TaskHistory from "../TaskList/TaskHistory";
-import { AuthContext } from "../../context/AuthProvider";
+import { useTasks } from "../../hooks/useApi";
 
 const EmployeeDashboard = ({ data, changeUser }) => {
-  const [tasks, setTasks] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const authContext = useContext(AuthContext);
-
-  const fetchTasks = async (isInitial = false) => {
-    try {
-      if (isInitial) setLoading(true);
-      const tasksData = await authContext.getUserTasks();
-      setTasks(tasksData);
-      setLoading(false);
-    } catch (error) {
-      setLoading(false);
-    }
-  };
+  const { tasks, tasksLoading, fetchTasks } = useTasks();
 
   useEffect(() => {
-    fetchTasks(true);
+    // Fetch tasks only once on mount
+    fetchTasks();
   }, []);
 
-  // Calculate counts dynamically from tasks to ensure sync
-  const taskNumbers = {
-    newTask: tasks.filter((t) => t.newTask).length,
-    active: tasks.filter((t) => t.active).length,
-    completed: tasks.filter((t) => t.completed).length,
-    failed: tasks.filter((t) => t.failed).length,
-    declined: tasks.filter((t) => t.declined).length,
-  };
+  // Calculate task counts only when tasks array changes
+  const taskCounts = useMemo(() => {
+    return {
+      newTask: tasks.filter((t) => t.newTask).length,
+      active: tasks.filter((t) => t.active).length,
+      completed: tasks.filter((t) => t.completed).length,
+      failed: tasks.filter((t) => t.failed).length,
+      declined: tasks.filter((t) => t.declined).length,
+    };
+  }, [tasks]);
 
   // Prepare data object for child components
-  const dashboardData = {
-    ...data,
-    tasks: tasks,
-    taskNumbers: taskNumbers,
-  };
+  const dashboardData = useMemo(
+    () => ({
+      ...data,
+      tasks: tasks,
+      taskNumbers: taskCounts,
+    }),
+    [data, tasks, taskCounts],
+  );
 
-  if (loading) {
+  if (tasksLoading && tasks.length === 0) {
     return (
       <div className="min-h-screen bg-[#1c1c1c] flex items-center justify-center">
         <div className="text-emerald-500 text-xl">Loading tasks...</div>
@@ -50,15 +43,11 @@ const EmployeeDashboard = ({ data, changeUser }) => {
   }
 
   return (
-    <div className="min-h-screen bg-[#1c1c1c] p-4 sm:p-10 relative overflow-hidden selection:bg-emerald-500/30">
-      {/* Background Blobs for Atmosphere */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-600/5 blur-[120px] rounded-full" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-emerald-500/5 blur-[120px] rounded-full" />
-
-      <div className="relative z-10 max-w-7xl mx-auto">
+    <div className="min-h-screen bg-[#1c1c1c] pb-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <Header data={dashboardData} changeUser={changeUser} />
         <TasklistNumber data={dashboardData} />
-        <TaskList data={dashboardData} onTaskUpdate={fetchTasks} />
+        <TaskList data={dashboardData} />
         <TaskHistory data={dashboardData} />
       </div>
     </div>

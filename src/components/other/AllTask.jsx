@@ -1,6 +1,6 @@
-import React, { useContext, useState, useEffect } from "react";
-import { AuthContext } from "../../context/AuthProvider";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTasks } from "../../hooks/useApi";
 
 const StatusBadge = ({ task }) => {
   if (task.completed) {
@@ -144,10 +144,8 @@ const TaskDetailsModal = ({ task, onClose, onNavigate }) => {
 };
 
 const AllTask = () => {
-  const authContext = useContext(AuthContext);
   const navigate = useNavigate();
-  const [tasks, setTasks] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { tasks, tasksLoading, fetchTasks } = useTasks();
   const [selectedTask, setSelectedTask] = useState(null);
   const [filter, setFilter] = useState("All");
 
@@ -161,19 +159,8 @@ const AllTask = () => {
   ];
 
   useEffect(() => {
-    fetchData();
+    fetchTasks();
   }, []);
-
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      const tasksData = await authContext.getUserTasks();
-      setTasks(tasksData);
-      setLoading(false);
-    } catch (error) {
-      setLoading(false);
-    }
-  };
 
   const handleTaskClick = (task) => {
     setSelectedTask(task);
@@ -191,7 +178,7 @@ const AllTask = () => {
     return task[filter] === true;
   });
 
-  if (loading) {
+  if (tasksLoading && tasks.length === 0) {
     return (
       <div className="mt-8 mb-10">
         <div className="bg-[#262626] rounded-2xl border border-white/5 shadow-xl p-8 text-center text-emerald-500 font-medium">

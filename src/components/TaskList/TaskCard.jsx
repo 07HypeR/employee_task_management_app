@@ -1,8 +1,8 @@
-import React, { useContext } from "react";
-import { AuthContext } from "../../context/AuthProvider";
+import React from "react";
+import { useTasks } from "../../hooks/useApi";
 
 const TaskCard = ({ task, onUpdate }) => {
-  const { updateTaskStatus } = useContext(AuthContext);
+  const { updateTaskStatus } = useTasks();
   const [loadingAction, setLoadingAction] = React.useState(null);
 
   const handleStatusUpdate = async (action) => {
@@ -10,6 +10,7 @@ const TaskCard = ({ task, onUpdate }) => {
       setLoadingAction(action);
       const result = await updateTaskStatus(task._id, action);
       if (result.success && onUpdate) {
+        // Optional callback if parent needs to do something
         onUpdate();
       }
     } catch (error) {
