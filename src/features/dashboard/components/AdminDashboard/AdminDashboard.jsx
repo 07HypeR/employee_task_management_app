@@ -1,7 +1,6 @@
 import React from "react";
-import Header from "../other/Header";
-import CreatTask from "../other/CreatTask";
-import AllTask from "../other/AllTask";
+import { Header } from "@components/layout";
+import { TaskForm, TaskRegistry } from "@features/tasks";
 
 const AdminDashboard = ({ data, changeUser }) => {
   return (
@@ -12,8 +11,8 @@ const AdminDashboard = ({ data, changeUser }) => {
 
       <div className="relative z-10 max-w-7xl mx-auto">
         <Header data={data} changeUser={changeUser} />
-        <CreatTask />
-        <AllTask />
+        <TaskForm />
+        <TaskRegistry />
       </div>
     </div>
   );

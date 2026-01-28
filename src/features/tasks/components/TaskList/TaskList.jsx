@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import TaskCard from "./TaskCard";
+import TaskCard from "../TaskCard/TaskCard";
 
 const ClockIcon = () => (
   <svg

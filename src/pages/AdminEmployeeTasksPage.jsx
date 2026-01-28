@@ -1,7 +1,7 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { AuthContext } from "../context/AuthProvider";
-import Header from "../components/other/Header";
+import { useTasks, useEmployees, useAuth } from "@hooks/useApi";
+import { Header } from "@components/layout";
 
 const TaskCard = ({ data }) => {
   const getStatusInfo = (task) => {
@@ -104,44 +104,45 @@ const TaskCard = ({ data }) => {
 const AdminEmployeeTasks = ({ changeUser }) => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const authContext = useContext(AuthContext);
+  const { tasks: allTasks, fetchTasks } = useTasks();
+  const { employees, fetchEmployees } = useEmployees();
+  const { user } = useAuth();
   const [employee, setEmployee] = useState(null);
-  const [tasks, setTasks] = useState([]);
+  const [filteredTasks, setFilteredTasks] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchData();
-  }, [id]);
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        await fetchEmployees();
+        await fetchTasks();
+      } catch (error) {
+        console.error("Error loading data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadData();
+  }, []);
 
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-
-      const employeesData = await authContext.getAllEmployees();
-      const emp = employeesData.find((e) => e._id === id);
+  useEffect(() => {
+    if (employees.length > 0) {
+      const emp = employees.find((e) => e._id === id);
       setEmployee(emp);
+    }
+  }, [employees, id]);
 
-      const allTasks = await authContext.getUserTasks();
-
+  useEffect(() => {
+    if (allTasks.length > 0) {
       const filtered = allTasks.filter((task) => {
         const isAssignedToEmp =
           task.assignedTo?._id === id || task.assignedTo === id;
-        const isAssignedByAdmin =
-          (task.assignedBy?._id || task.assignedBy) === authContext.user?._id;
-        return isAssignedToEmp && isAssignedByAdmin;
+        return isAssignedToEmp;
       });
-
-      setTasks(filtered);
-      setLoading(false);
-    } catch (error) {
-      setLoading(false);
+      setFilteredTasks(filtered);
     }
-  };
-
-  if (!authContext.user || authContext.user.role !== "admin") {
-    navigate("/");
-    return null;
-  }
+  }, [allTasks, id]);
 
   if (loading) {
     return (
@@ -159,7 +160,7 @@ const AdminEmployeeTasks = ({ changeUser }) => {
       <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-500/5 blur-[120px] rounded-full" />
 
       <div className="relative z-10 max-w-7xl mx-auto">
-        <Header data={authContext.user} changeUser={changeUser} />
+        <Header data={user} changeUser={changeUser} />
 
         <div className="mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div className="flex items-center gap-4">
@@ -194,12 +195,13 @@ const AdminEmployeeTasks = ({ changeUser }) => {
 
           <div className="px-4 py-2 w-fit bg-emerald-500/10 rounded-xl border border-emerald-500/20">
             <span className="text-[10px] text-center font-black text-emerald-500 uppercase tracking-widest">
-              {tasks.length} {tasks.length === 1 ? "Task" : "Tasks"}
+              {filteredTasks.length}{" "}
+              {filteredTasks.length === 1 ? "Task" : "Tasks"}
             </span>
           </div>
         </div>
 
-        {tasks.length === 0 ? (
+        {filteredTasks.length === 0 ? (
           <div className="bg-[#111111]/60 backdrop-blur-2xl p-20 rounded-[2.5rem] border border-white/5 text-center shadow-2xl">
             <div className="w-20 h-20 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl shadow-inner border border-emerald-500/10">
               📭
@@ -213,7 +215,7 @@ const AdminEmployeeTasks = ({ changeUser }) => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {tasks.map((task, idx) => (
+            {filteredTasks.map((task, idx) => (
               <TaskCard key={task._id || idx} data={task} />
             ))}
           </div>

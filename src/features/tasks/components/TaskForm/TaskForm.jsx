@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useEmployees, useTasks } from "../../hooks/useApi";
+import { useEmployees, useTasks } from "@hooks/useApi";
 
 const CreatTask = () => {
   const { employees, fetchEmployees } = useEmployees();
@@ -15,6 +15,15 @@ const CreatTask = () => {
   useEffect(() => {
     fetchEmployees();
   }, []);
+
+  useEffect(() => {
+    if (message.text && message.type === "success") {
+      const timer = setTimeout(() => {
+        setMessage({ type: "", text: "" });
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
 
   const submitHandler = async (e) => {
     e.preventDefault();

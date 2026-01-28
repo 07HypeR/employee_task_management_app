@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { AuthContext } from "../../context/AuthProvider";
+import { useAuth } from "@hooks/useApi";
 
 const Register = () => {
   const [formData, setFormData] = React.useState({
@@ -13,14 +13,14 @@ const Register = () => {
   const [error, setError] = React.useState("");
   const [success, setSuccess] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
-  const authContext = React.useContext(AuthContext);
+  const { user, register } = useAuth();
   const navigate = useNavigate();
 
   React.useEffect(() => {
-    if (authContext.user) {
+    if (user) {
       navigate("/");
     }
-  }, [authContext.user, navigate]);
+  }, [user, navigate]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -41,7 +41,7 @@ const Register = () => {
     }
 
     setLoading(true);
-    const result = await authContext.register(formData);
+    const result = await register(formData);
     setLoading(false);
     if (result.success) {
       setSuccess(true);

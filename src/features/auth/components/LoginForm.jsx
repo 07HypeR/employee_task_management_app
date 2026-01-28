@@ -16,12 +16,16 @@ const Login = ({ handleLogin }) => {
       const result = await handleLogin(email, password);
 
       if (!result.success) {
-        if (result.error === "Invalid email or password") {
-          setError("Invalid mail/password");
+        const errorMsg = result.error?.toLowerCase() || "";
+
+        if (errorMsg.includes("not found") || errorMsg.includes("exist")) {
+          setError("This email doesn't exist");
         } else if (
-          result.error?.includes("failed") ||
-          result.error?.includes("fetch")
+          errorMsg.includes("invalid") ||
+          errorMsg.includes("password")
         ) {
+          setError("Invalid email or password");
+        } else if (errorMsg.includes("failed") || errorMsg.includes("fetch")) {
           setError("Server error, try again later");
         } else {
           setError("Something went wrong");

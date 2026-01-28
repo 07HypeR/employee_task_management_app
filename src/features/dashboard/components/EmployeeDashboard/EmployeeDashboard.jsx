@@ -1,9 +1,7 @@
 import React, { useEffect, useMemo } from "react";
-import Header from "../other/Header";
-import TasklistNumber from "../other/TasklistNumber";
-import TaskList from "../TaskList/TaskList";
-import TaskHistory from "../TaskList/TaskHistory";
-import { useTasks } from "../../hooks/useApi";
+import { Header, TaskStatistics } from "@components/layout";
+import { TaskList, TaskHistory } from "@features/tasks";
+import { useTasks } from "@hooks/useApi";
 
 const EmployeeDashboard = ({ data, changeUser }) => {
   const { tasks, tasksLoading, fetchTasks } = useTasks();
@@ -43,10 +41,14 @@ const EmployeeDashboard = ({ data, changeUser }) => {
   }
 
   return (
-    <div className="min-h-screen bg-[#1c1c1c] pb-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#1c1c1c] p-4 sm:p-10 relative overflow-hidden selection:bg-emerald-500/30">
+      {/* Background Atmosphere */}
+      <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-emerald-600/5 blur-[120px] rounded-full" />
+      <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-500/5 blur-[120px] rounded-full" />
+
+      <div className="relative z-10 max-w-7xl mx-auto">
         <Header data={dashboardData} changeUser={changeUser} />
-        <TasklistNumber data={dashboardData} />
+        <TaskStatistics data={dashboardData} />
         <TaskList data={dashboardData} />
         <TaskHistory data={dashboardData} />
       </div>

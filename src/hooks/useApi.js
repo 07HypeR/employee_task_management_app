@@ -12,7 +12,6 @@ export const useAuth = () => {
 
   const login = async (email, password) => {
     try {
-      setAuthLoading(true);
       const data = await authAPI.login(email, password);
 
       localStorage.setItem("token", data.token);
@@ -22,20 +21,15 @@ export const useAuth = () => {
       return { success: true, data };
     } catch (error) {
       return { success: false, error: error.message };
-    } finally {
-      setAuthLoading(false);
     }
   };
 
   const register = async (userData) => {
     try {
-      setAuthLoading(true);
       const data = await authAPI.register(userData);
       return { success: true, data };
     } catch (error) {
       return { success: false, error: error.message };
-    } finally {
-      setAuthLoading(false);
     }
   };
 

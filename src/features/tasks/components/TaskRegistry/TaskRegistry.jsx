@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useTasks } from "../../hooks/useApi";
+import { useTasks } from "@hooks/useApi";
 
 const StatusBadge = ({ task }) => {
   if (task.completed) {

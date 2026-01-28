@@ -1,21 +1,23 @@
-import React from "react";
-import Login from "./components/Auth/Login";
-import Register from "./components/Auth/Register";
-import EmployeeDashboard from "./components/Dashboard/EmployeeDashboard";
-import AdminDashboard from "./components/Dashboard/AdminDashboard";
-import { AuthContext } from "./context/AuthProvider";
+import { useEffect } from "react";
+import { LoginForm, RegisterForm } from "@features/auth";
+import { EmployeeDashboard, AdminDashboard } from "@features/dashboard";
+import { useAuth } from "@hooks/useApi";
 import { Routes, Route, Navigate } from "react-router-dom";
 import TaskPage from "./pages/TaskPage";
-import AdminEmployeeTasks from "./pages/AdminEmployeeTasks";
+import AdminEmployeeTasksPage from "./pages/AdminEmployeeTasksPage";
 
 const App = () => {
-  const authContext = React.useContext(AuthContext);
+  const { user, authLoading, login, logout, initAuth } = useAuth();
+
+  useEffect(() => {
+    initAuth();
+  }, []);
 
   const handleLogin = async (email, password) => {
-    return await authContext.login(email, password);
+    return await login(email, password);
   };
 
-  if (authContext.loading) {
+  if (authLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-[#1c1c1c]">
         <div className="text-emerald-500 text-xl">Loading...</div>
@@ -23,7 +25,6 @@ const App = () => {
     );
   }
 
-  const user = authContext.user;
   const userRole = user?.role;
 
   return (
@@ -32,12 +33,26 @@ const App = () => {
         path="/"
         element={
           <>
-            {!user ? <Login handleLogin={handleLogin} /> : ""}
+            {!user ? <LoginForm handleLogin={handleLogin} /> : ""}
             {userRole === "admin" ? (
-              <AdminDashboard changeUser={authContext.logout} data={user} />
+              <AdminDashboard changeUser={logout} data={user} />
             ) : userRole === "employee" ? (
-              <EmployeeDashboard changeUser={authContext.logout} data={user} />
-            ) : null}
+              <EmployeeDashboard changeUser={logout} data={user} />
+            ) : (
+              <div className="flex flex-col items-center justify-center min-h-screen bg-[#1c1c1c] text-white">
+                <h1 className="text-2xl font-bold mb-4">Unknown Role</h1>
+                <p className="mb-4">Role detected: {String(userRole)}</p>
+                <button
+                  onClick={() => {
+                    logout();
+                    window.location.reload();
+                  }}
+                  className="px-6 py-2 bg-emerald-600 rounded-lg hover:bg-emerald-700"
+                >
+                  Logout & Reset
+                </button>
+              </div>
+            )}
           </>
         }
       />
@@ -45,7 +60,7 @@ const App = () => {
         path="/tasks/:type"
         element={
           userRole === "employee" ? (
-            <TaskPage changeUser={authContext.logout} />
+            <TaskPage changeUser={logout} />
           ) : (
             <Navigate to="/" />
           )
@@ -55,13 +70,13 @@ const App = () => {
         path="/employee-tasks/:id"
         element={
           userRole === "admin" ? (
-            <AdminEmployeeTasks changeUser={authContext.logout} />
+            <AdminEmployeeTasksPage changeUser={logout} />
           ) : (
             <Navigate to="/" />
           )
         }
       />
-      <Route path="/register" element={<Register />} />
+      <Route path="/register" element={<RegisterForm />} />
     </Routes>
   );
 };

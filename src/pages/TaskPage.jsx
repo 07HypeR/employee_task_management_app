@@ -1,31 +1,23 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { AuthContext } from "../context/AuthProvider";
-import Header from "../components/other/Header";
-import TaskCard from "../components/TaskList/TaskCard";
+import { useTasks, useAuth } from "@hooks/useApi";
+import { Header } from "@components/layout";
+import { TaskCard } from "@features/tasks";
 
 const TaskPage = ({ changeUser }) => {
   const { type } = useParams();
   const navigate = useNavigate();
-  const authContext = useContext(AuthContext);
-  const [tasks, setTasks] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { tasks: allTasks, tasksLoading, fetchTasks } = useTasks();
+  const { user } = useAuth();
+  const [filteredTasks, setFilteredTasks] = useState([]);
 
   useEffect(() => {
     fetchTasks();
-  }, [type]);
+  }, []);
 
-  const fetchTasks = async () => {
-    try {
-      setLoading(true);
-      const allTasks = await authContext.getUserTasks();
-      const filtered = getFilteredTasks(allTasks);
-      setTasks(filtered);
-      setLoading(false);
-    } catch (error) {
-      setLoading(false);
-    }
-  };
+  useEffect(() => {
+    setFilteredTasks(getFilteredTasks(allTasks));
+  }, [type, allTasks]);
 
   const getFilteredTasks = (allTasks) => {
     switch (type) {
@@ -61,12 +53,7 @@ const TaskPage = ({ changeUser }) => {
     }
   };
 
-  if (!authContext.user || authContext.user.role !== "employee") {
-    navigate("/");
-    return null;
-  }
-
-  if (loading) {
+  if (tasksLoading && filteredTasks.length === 0) {
     return (
       <div className="min-h-screen bg-[#1c1c1c] flex items-center justify-center">
         <div className="text-emerald-500 text-xl font-bold animate-pulse">
@@ -83,7 +70,7 @@ const TaskPage = ({ changeUser }) => {
       <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-emerald-500/5 blur-[120px] rounded-full pointer-events-none" />
 
       <div className="relative z-10 max-w-7xl mx-auto">
-        <Header data={authContext.user} changeUser={changeUser} />
+        <Header data={user} changeUser={changeUser} />
 
         <div className="mt-8 mb-12 flex flex-col sm:flex-row sm:items-center gap-6">
           <div className="flex items-center gap-4">
@@ -118,12 +105,13 @@ const TaskPage = ({ changeUser }) => {
           <div className="sm:ml-auto w-fit flex items-center gap-3 bg-emerald-500/10 backdrop-blur-2xl px-5 py-2.5 rounded-2xl border border-emerald-500/10 shadow-lg shadow-emerald-500/5">
             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             <span className="text-xs text-emerald-500 font-black uppercase tracking-widest">
-              {tasks.length} {tasks.length === 1 ? "Assignment" : "Assignments"}
+              {filteredTasks.length}{" "}
+              {filteredTasks.length === 1 ? "Assignment" : "Assignments"}
             </span>
           </div>
         </div>
 
-        {tasks.length === 0 ? (
+        {filteredTasks.length === 0 ? (
           <div className="bg-[#111111]/40 backdrop-blur-2xl py-24 rounded-[3rem] border border-white/5 text-center shadow-2xl">
             <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6 border border-white/5">
               <span className="text-4xl opacity-40">📬</span>
@@ -143,7 +131,7 @@ const TaskPage = ({ changeUser }) => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {tasks.map((task) => (
+            {filteredTasks.map((task) => (
               <TaskCard key={task._id} task={task} onUpdate={fetchTasks} />
             ))}
           </div>

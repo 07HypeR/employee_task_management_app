@@ -162,7 +162,7 @@ const TaskHistory = ({ data }) => {
             <table className="w-full text-left border-collapse">
               <thead className="bg-[#1c1c1c]/50 text-gray-400 text-[10px] uppercase tracking-[0.2em] font-black">
                 <tr>
-                  <th className="px-6 py-4">Task Name</th>
+                  <th className="px-6 py-4">Task</th>
                   <th className="px-6 py-4">Assigned by</th>
                   <th className="px-6 py-4">Outcome</th>
                   <th className="px-6 py-4 text-right">Deadline</th>
@@ -190,10 +190,13 @@ const TaskHistory = ({ data }) => {
                         className="text-sm hover:bg-white/[0.02] transition-colors group cursor-pointer"
                       >
                         <td className="px-6 py-4">
-                          <div className="font-bold text-gray-300 group-hover:text-white transition-colors">
+                          <div
+                            className="font-bold text-slate-200 group-hover:text-emerald-400 transition-colors truncate max-w-[140px] sm:max-w-[250px]"
+                            title={task.title}
+                          >
                             {task.title}
                           </div>
-                          <div className="text-[10px] text-gray-600 line-clamp-1 truncate max-w-[200px]">
+                          <div className="text-[11px] text-gray-500 line-clamp-1 font-medium mt-0.5 max-w-[200px]">
                             {task.description}
                           </div>
                         </td>

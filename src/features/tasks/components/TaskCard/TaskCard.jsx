@@ -1,5 +1,5 @@
 import React from "react";
-import { useTasks } from "../../hooks/useApi";
+import { useTasks } from "@hooks/useApi";
 
 const TaskCard = ({ task, onUpdate }) => {
   const { updateTaskStatus } = useTasks();
@@ -100,7 +100,7 @@ const TaskCard = ({ task, onUpdate }) => {
               className={`w-6 h-6 rounded-full flex items-center justify-center border ${status.border} ${status.bg}`}
             >
               <span className={`text-[10px] font-black ${status.color}`}>
-                {task.assignedBy.fname[0]}
+                {task.assignedBy?.fname?.[0]}
               </span>
             </div>
             <p className="text-[11px] text-gray-500">
