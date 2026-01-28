@@ -3,15 +3,19 @@ import { AuthContext } from "../../context/AuthProvider";
 
 const TaskCard = ({ task, onUpdate }) => {
   const { updateTaskStatus } = useContext(AuthContext);
+  const [loadingAction, setLoadingAction] = React.useState(null);
 
   const handleStatusUpdate = async (action) => {
     try {
+      setLoadingAction(action);
       const result = await updateTaskStatus(task._id, action);
       if (result.success && onUpdate) {
         onUpdate();
       }
     } catch (error) {
       console.error("Failed to update status", error);
+    } finally {
+      setLoadingAction(null);
     }
   };
 
@@ -111,32 +115,128 @@ const TaskCard = ({ task, onUpdate }) => {
           {task.newTask && (
             <>
               <button
+                disabled={!!loadingAction}
                 onClick={() => handleStatusUpdate("accept")}
-                className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold py-2.5 rounded-xl transition-all active:scale-95 shadow-lg shadow-emerald-600/20 cursor-pointer"
+                className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold py-2.5 rounded-xl transition-all active:scale-95 shadow-lg shadow-emerald-600/20 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-wait"
               >
-                Accept
+                {loadingAction === "accept" ? (
+                  <svg
+                    className="animate-spin h-3.5 w-3.5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                ) : (
+                  "Accept"
+                )}
               </button>
               <button
+                disabled={!!loadingAction}
                 onClick={() => handleStatusUpdate("decline")}
-                className="px-4 bg-white/5 hover:bg-white/10 text-gray-400 text-xs font-bold py-2.5 rounded-xl border border-white/5 transition-all cursor-pointer"
+                className="px-4 bg-white/5 hover:bg-white/10 text-gray-400 text-xs font-bold py-2.5 rounded-xl border border-white/5 transition-all cursor-pointer flex items-center justify-center disabled:opacity-70 disabled:cursor-wait"
               >
-                Decline
+                {loadingAction === "decline" ? (
+                  <svg
+                    className="animate-spin h-3.5 w-3.5 text-gray-400"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                ) : (
+                  "Decline"
+                )}
               </button>
             </>
           )}
           {task.active && (
             <>
               <button
+                disabled={!!loadingAction}
                 onClick={() => handleStatusUpdate("complete")}
-                className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold py-2.5 rounded-xl transition-all active:scale-95 shadow-lg shadow-emerald-600/20 cursor-pointer"
+                className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold py-2.5 rounded-xl transition-all active:scale-95 shadow-lg shadow-emerald-600/20 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-wait"
               >
-                Done
+                {loadingAction === "complete" ? (
+                  <svg
+                    className="animate-spin h-3.5 w-3.5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                ) : (
+                  "Done"
+                )}
               </button>
               <button
+                disabled={!!loadingAction}
                 onClick={() => handleStatusUpdate("fail")}
-                className="flex-1 bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 text-xs font-bold py-2.5 rounded-xl border border-rose-500/10 transition-all cursor-pointer"
+                className="flex-1 bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 text-xs font-bold py-2.5 rounded-xl border border-rose-500/10 transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-wait"
               >
-                Failed
+                {loadingAction === "fail" ? (
+                  <svg
+                    className="animate-spin h-3.5 w-3.5 text-rose-500"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                ) : (
+                  "Failed"
+                )}
               </button>
             </>
           )}
