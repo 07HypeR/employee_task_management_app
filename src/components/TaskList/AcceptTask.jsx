@@ -1,23 +1,25 @@
 import React, { useContext } from "react";
 import { AuthContext } from "../../context/AuthProvider";
 
-const AcceptTask = ({ data }) => {
+const AcceptTask = ({ data, onUpdate }) => {
   const { updateTaskStatus } = useContext(AuthContext);
 
-  // Get logged in user email to identify who owns the task
-  const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
-  const userEmail = loggedInUser?.data.email;
-
-  const handleComplete = () => {
-    if (userEmail) {
-      updateTaskStatus(userEmail, data.title, "completed");
-    }
+  const handleComplete = async () => {
+    try {
+      const result = await updateTaskStatus(data._id, "complete");
+      if (result.success && onUpdate) {
+        onUpdate(); // Refresh tasks
+      }
+    } catch (error) {}
   };
 
-  const handleFailed = () => {
-    if (userEmail) {
-      updateTaskStatus(userEmail, data.title, "failed");
-    }
+  const handleFailed = async () => {
+    try {
+      const result = await updateTaskStatus(data._id, "fail");
+      if (result.success && onUpdate) {
+        onUpdate(); // Refresh tasks
+      }
+    } catch (error) {}
   };
 
   return (
@@ -29,9 +31,22 @@ const AcceptTask = ({ data }) => {
         <span className="text-slate-500 text-xs font-medium">{data.date}</span>
       </div>
       <h2 className="text-xl font-bold mb-3 leading-tight">{data.title}</h2>
-      <p className="text-slate-400 text-sm line-clamp-3 mb-6 leading-relaxed">
+      <p className="text-slate-400 text-sm line-clamp-3 mb-4 leading-relaxed">
         {data.description}
       </p>
+
+      {/* Assigned By Information */}
+      {data.assignedBy && (
+        <div className="mb-4 pb-4 border-b border-white/5">
+          <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-1">
+            Assigned By
+          </p>
+          <p className="text-sm text-amber-400 font-semibold">
+            {data.assignedBy.fname} {data.assignedBy.lname}
+          </p>
+        </div>
+      )}
+
       <div className="mt-auto flex gap-3">
         <button
           onClick={handleComplete}

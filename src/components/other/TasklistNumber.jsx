@@ -10,17 +10,24 @@ const TasklistNumber = ({ data }) => {
       path: "/tasks/new",
     },
     {
-      label: "Completed",
-      count: data.taskNumbers.completed,
-      gradient: "from-emerald-500 to-teal-500",
-      path: "/tasks/completed",
-    },
-    {
       label: "Accepted",
       count: data.taskNumbers.active,
       gradient: "from-amber-400 to-orange-500",
       path: "/tasks/accepted",
     },
+    {
+      label: "Declined",
+      count: data.taskNumbers.declined,
+      gradient: "from-slate-500 to-slate-700",
+      path: "/tasks/declined",
+    },
+    {
+      label: "Completed",
+      count: data.taskNumbers.completed,
+      gradient: "from-emerald-500 to-teal-500",
+      path: "/tasks/completed",
+    },
+
     {
       label: "Failed",
       count: data.taskNumbers.failed,
@@ -30,7 +37,7 @@ const TasklistNumber = ({ data }) => {
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mt-8">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5 mt-8">
       {stats.map((stat, idx) => (
         <Link
           key={idx}

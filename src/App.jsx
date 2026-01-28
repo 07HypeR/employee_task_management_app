@@ -6,86 +6,25 @@ import AdminDashboard from "./components/Dashboard/AdminDashboard";
 import { AuthContext } from "./context/AuthProvider";
 import { Routes, Route, Navigate } from "react-router-dom";
 import TaskPage from "./pages/TaskPage";
+import AdminEmployeeTasks from "./pages/AdminEmployeeTasks";
 
 const App = () => {
-  const [user, setUser] = React.useState(null);
-  const [loggedInUser, setLoggedInUser] = React.useState(null);
-  const [loading, setLoading] = React.useState(true);
-  const authData = React.useContext(AuthContext);
+  const authContext = React.useContext(AuthContext);
 
-  React.useEffect(() => {
-    const loggedInUser = localStorage.getItem("loggedInUser");
-    if (loggedInUser) {
-      const userData = JSON.parse(loggedInUser);
-      setUser(userData.role);
-      if (userData.role === "employee" && userData.data) {
-        setLoggedInUser(userData.data);
-      } else if (userData.role === "admin" && userData.data) {
-        setLoggedInUser(userData.data);
-      }
-    }
-    setLoading(false);
-  }, []);
-
-  // Sync logged-in user with context updates (when tasks are added/updated)
-  React.useEffect(() => {
-    if (!authData || !user) return;
-
-    const storedUser = localStorage.getItem("loggedInUser");
-    if (!storedUser) return;
-
-    const userData = JSON.parse(storedUser);
-
-    if (userData.role === "employee" && authData.employees) {
-      const updatedEmployee = authData.employees.find(
-        (emp) => emp.email === userData.data.email,
-      );
-      if (updatedEmployee) {
-        setLoggedInUser(updatedEmployee);
-        localStorage.setItem(
-          "loggedInUser",
-          JSON.stringify({ role: "employee", data: updatedEmployee }),
-        );
-      }
-    }
-  }, [authData?.employees, user]);
-
-  const handleLogin = (email, password) => {
-    if (
-      authData &&
-      authData.admin &&
-      authData.admin.find((a) => a.email === email && a.password === password)
-    ) {
-      const admin = authData.admin.find(
-        (a) => a.email === email && a.password === password,
-      );
-      setUser("admin");
-      setLoggedInUser(admin);
-      localStorage.setItem(
-        "loggedInUser",
-        JSON.stringify({ role: "admin", data: admin }),
-      );
-      return true;
-    } else if (authData && authData.employees) {
-      const employee = authData.employees.find(
-        (e) => e.email === email && e.password === password,
-      );
-      if (employee) {
-        setUser("employee");
-        setLoggedInUser(employee);
-        localStorage.setItem(
-          "loggedInUser",
-          JSON.stringify({ role: "employee", data: employee }),
-        );
-        return true;
-      }
-    }
-    return false;
+  const handleLogin = async (email, password) => {
+    return await authContext.login(email, password);
   };
 
-  if (loading) {
-    return null;
+  if (authContext.loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-[#1c1c1c]">
+        <div className="text-emerald-500 text-xl">Loading...</div>
+      </div>
+    );
   }
+
+  const user = authContext.user;
+  const userRole = user?.role;
 
   return (
     <Routes>
@@ -94,10 +33,10 @@ const App = () => {
         element={
           <>
             {!user ? <Login handleLogin={handleLogin} /> : ""}
-            {user === "admin" ? (
-              <AdminDashboard changeUser={setUser} data={loggedInUser} />
-            ) : user == "employee" ? (
-              <EmployeeDashboard changeUser={setUser} data={loggedInUser} />
+            {userRole === "admin" ? (
+              <AdminDashboard changeUser={authContext.logout} data={user} />
+            ) : userRole === "employee" ? (
+              <EmployeeDashboard changeUser={authContext.logout} data={user} />
             ) : null}
           </>
         }
@@ -105,8 +44,18 @@ const App = () => {
       <Route
         path="/tasks/:type"
         element={
-          user === "employee" ? (
-            <TaskPage changeUser={setUser} />
+          userRole === "employee" ? (
+            <TaskPage changeUser={authContext.logout} />
+          ) : (
+            <Navigate to="/" />
+          )
+        }
+      />
+      <Route
+        path="/employee-tasks/:id"
+        element={
+          userRole === "admin" ? (
+            <AdminEmployeeTasks changeUser={authContext.logout} />
           ) : (
             <Navigate to="/" />
           )

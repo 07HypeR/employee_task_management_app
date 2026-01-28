@@ -6,19 +6,33 @@ const Login = ({ handleLogin }) => {
   const [password, setPassword] = React.useState("");
   const [error, setError] = React.useState("");
 
-  const submitHandler = (e) => {
+  const submitHandler = async (e) => {
     e.preventDefault();
-    setError(""); // Clear previous errors
+    setError("");
 
-    const success = handleLogin(email, password);
+    try {
+      const result = await handleLogin(email, password);
 
-    if (!success) {
-      setError("Invalid credentials. Please check your email and password.");
-      return;
+      if (!result.success) {
+        if (result.error === "Invalid email or password") {
+          setError("Invalid mail/password");
+        } else if (
+          result.error?.includes("failed") ||
+          result.error?.includes("fetch")
+        ) {
+          setError("Server error, try again later");
+        } else {
+          setError("Something went wrong");
+        }
+
+        return;
+      }
+
+      setEmail("");
+      setPassword("");
+    } catch (err) {
+      setError("Something went wrong");
     }
-
-    setEmail("");
-    setPassword("");
   };
 
   return (
@@ -46,10 +60,9 @@ const Login = ({ handleLogin }) => {
             </p>
           </div>
 
-          {/* Error Message */}
           {error && (
-            <div className="mb-6 p-4 bg-rose-500/10 border border-rose-500/30 rounded-2xl animate-shake">
-              <div className="flex items-center gap-3">
+            <div className="mb-6 p-4 bg-rose-500/10 border border-rose-500/30 rounded-2xl animate-shake relative group/error">
+              <div className="flex items-center gap-3 pr-8">
                 <div className="w-8 h-8 rounded-full bg-rose-500/20 flex items-center justify-center shrink-0">
                   <span className="text-rose-500 text-lg">⚠</span>
                 </div>
@@ -57,6 +70,13 @@ const Login = ({ handleLogin }) => {
                   {error}
                 </p>
               </div>
+              <button
+                onClick={() => setError("")}
+                className="absolute top-1/2 -translate-y-1/2 right-3 w-6 h-6 rounded-lg bg-rose-500/10 flex items-center justify-center text-rose-500 hover:bg-rose-500 hover:text-white transition-all duration-300 cursor-pointer"
+                title="Close"
+              >
+                <span className="text-lg leading-none">&times;</span>
+              </button>
             </div>
           )}
 

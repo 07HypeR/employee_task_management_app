@@ -1,49 +1,66 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { AuthContext } from "../../context/AuthProvider";
 
 const CreatTask = () => {
-  const authData = useContext(AuthContext);
+  const authContext = useContext(AuthContext);
+  const [employees, setEmployees] = useState([]);
   const [taskTitle, setTaskTitle] = useState("");
   const [taskDate, setTaskDate] = useState("");
   const [assignTo, setAssignTo] = useState("");
   const [category, setCategory] = useState("");
   const [taskDescription, setTaskDescription] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState({ type: "", text: "" });
 
-  const submitHandler = (e) => {
+  useEffect(() => {
+    fetchEmployees();
+  }, []);
+
+  const fetchEmployees = async () => {
+    try {
+      const employeesData = await authContext.getAllEmployees();
+      setEmployees(employeesData);
+    } catch (error) {}
+  };
+
+  const submitHandler = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setMessage({ type: "", text: "" });
 
-    const taskToAdd = {
-      title: taskTitle,
-      date: taskDate,
-      assignTo,
-      category,
-      description: taskDescription,
-      active: false,
-      newTask: true,
-      failed: false,
-      completed: false,
-    };
+    try {
+      const taskData = {
+        title: taskTitle,
+        description: taskDescription,
+        date: taskDate,
+        category,
+        assignedTo: assignTo, // This should be the employee's ID
+      };
 
-    const updatedEmployees = authData.employees.map((elem) => {
-      if (assignTo == elem.fname) {
-        return {
-          ...elem,
-          tasks: [...elem.tasks, taskToAdd],
-          taskNumbers: {
-            ...elem.taskNumbers,
-            newTask: elem.taskNumbers.newTask + 1,
-          },
-        };
+      const result = await authContext.createTask(taskData);
+
+      if (result.success) {
+        setMessage({ type: "success", text: "Task created successfully!" });
+        // Clear form
+        setTaskTitle("");
+        setTaskDate("");
+        setAssignTo("");
+        setCategory("");
+        setTaskDescription("");
+      } else {
+        setMessage({
+          type: "error",
+          text: result.error || "Failed to create task",
+        });
       }
-      return elem;
-    });
-
-    authData.updateEmployees(updatedEmployees);
-    setTaskTitle("");
-    setTaskDate("");
-    setAssignTo("");
-    setCategory("");
-    setTaskDescription("");
+    } catch (error) {
+      setMessage({
+        type: "error",
+        text: "An error occurred while creating the task",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -66,6 +83,18 @@ const CreatTask = () => {
             </span>
           </div>
         </div>
+
+        {message.text && (
+          <div
+            className={`mb-6 p-4 rounded-2xl ${message.type === "success" ? "bg-emerald-500/10 border border-emerald-500/30" : "bg-rose-500/10 border border-rose-500/30"}`}
+          >
+            <p
+              className={`text-xs sm:text-sm font-semibold ${message.type === "success" ? "text-emerald-400" : "text-rose-400"}`}
+            >
+              {message.text}
+            </p>
+          </div>
+        )}
 
         <form
           onSubmit={submitHandler}
@@ -103,14 +132,25 @@ const CreatTask = () => {
                 <label className="text-[10px] font-bold text-emerald-500/60 uppercase tracking-widest ml-4">
                   Assign To
                 </label>
-                <input
-                  className="w-full h-12 sm:h-14 outline-none bg-black/20 border border-emerald-500/10 text-white px-5 sm:px-6 rounded-xl sm:rounded-2xl placeholder:text-slate-600 focus:border-emerald-500/40 focus:bg-black/40 transition-all duration-300 text-sm sm:text-base"
-                  type="text"
-                  placeholder="Employee Name"
+                <select
+                  className="w-full h-12 sm:h-14 outline-none bg-black/20 border border-emerald-500/10 text-white px-5 sm:px-6 rounded-xl sm:rounded-2xl focus:border-emerald-500/40 focus:bg-black/40 transition-all duration-300 text-sm sm:text-base appearance-none cursor-pointer"
                   value={assignTo}
                   onChange={(e) => setAssignTo(e.target.value)}
                   required
-                />
+                >
+                  <option value="" className="bg-[#1c1c1c]">
+                    Select Employee
+                  </option>
+                  {employees.map((employee) => (
+                    <option
+                      key={employee._id}
+                      value={employee._id}
+                      className="bg-[#1c1c1c]"
+                    >
+                      {employee.fname} {employee.lname}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
 
@@ -142,8 +182,11 @@ const CreatTask = () => {
                 required
               />
             </div>
-            <button className="mt-6 sm:mt-8 w-full h-12 sm:h-14 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl sm:rounded-2xl transition-all duration-300 shadow-lg shadow-emerald-500/20 active:scale-[0.98] cursor-pointer text-sm sm:text-base">
-              Create Task
+            <button
+              disabled={loading}
+              className="mt-6 sm:mt-8 w-full h-12 sm:h-14 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl sm:rounded-2xl transition-all duration-300 shadow-lg shadow-emerald-500/20 active:scale-[0.98] cursor-pointer text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? "Creating..." : "Create Task"}
             </button>
           </div>
         </form>

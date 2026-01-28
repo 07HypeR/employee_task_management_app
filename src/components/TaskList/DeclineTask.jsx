@@ -1,15 +1,15 @@
 import React from "react";
 
-const CompleteTask = ({ data }) => {
+const DeclineTask = ({ data }) => {
   return (
-    <div className="h-full p-6 bg-white/5 backdrop-blur-2xl rounded-3xl border border-white/10 bg-emerald-500/10 hover:bg-emerald-500/[0.15] transition-all duration-300">
+    <div className="h-full p-6 bg-[#111111]/80 backdrop-blur-2xl rounded-3xl border border-white/5 bg-slate-500/10 hover:bg-slate-500/[0.15] transition-all duration-300">
       <div className="flex justify-between items-center mb-4">
-        <span className="bg-emerald-500/20 text-emerald-500 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider border border-emerald-500/20">
+        <span className="bg-slate-500/20 text-slate-400 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider border border-white/5">
           {data.category}
         </span>
         <span className="text-slate-500 text-xs font-medium">{data.date}</span>
       </div>
-      <h2 className="text-xl font-bold mb-3 leading-tight text-emerald-100">
+      <h2 className="text-xl font-bold mb-3 leading-tight text-slate-200">
         {data.title}
       </h2>
       <p className="text-slate-400 text-sm line-clamp-3 mb-4 leading-relaxed">
@@ -22,14 +22,14 @@ const CompleteTask = ({ data }) => {
           <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-1">
             Assigned By
           </p>
-          <p className="text-sm text-emerald-400 font-semibold">
+          <p className="text-sm text-slate-400 font-semibold">
             {data.assignedBy.fname} {data.assignedBy.lname}
           </p>
         </div>
       )}
 
       <div className="mt-auto">
-        <div className="w-full flex items-center justify-center gap-2 bg-emerald-500/20 text-emerald-500 font-bold py-2.5 rounded-xl border border-emerald-500/30">
+        <div className="w-full flex items-center justify-center gap-2 bg-white/5 text-slate-500 font-bold py-2.5 rounded-xl border border-white/5">
           <svg
             className="w-5 h-5"
             fill="none"
@@ -40,14 +40,14 @@ const CompleteTask = ({ data }) => {
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeWidth="2"
-              d="M5 13l4 4L19 7"
+              d="M6 18L18 6M6 6l12 12"
             />
           </svg>
-          Completed
+          Declined
         </div>
       </div>
     </div>
   );
 };
 
-export default CompleteTask;
+export default DeclineTask;

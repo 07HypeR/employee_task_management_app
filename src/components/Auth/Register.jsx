@@ -11,15 +11,15 @@ const Register = () => {
     role: "employee",
   });
   const [error, setError] = React.useState("");
-  const { registerUser } = React.useContext(AuthContext);
+  const [success, setSuccess] = React.useState(false);
+  const authContext = React.useContext(AuthContext);
   const navigate = useNavigate();
 
   React.useEffect(() => {
-    const loggedInUser = localStorage.getItem("loggedInUser");
-    if (loggedInUser) {
+    if (authContext.user) {
       navigate("/");
     }
-  }, [navigate]);
+  }, [authContext.user, navigate]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -27,7 +27,7 @@ const Register = () => {
     setError("");
   };
 
-  const submitHandler = (e) => {
+  const submitHandler = async (e) => {
     e.preventDefault();
     if (
       !formData.fname ||
@@ -39,18 +39,28 @@ const Register = () => {
       return;
     }
 
-    const success = registerUser(formData);
-    if (success) {
-      alert("Registration successful! Please log in.");
-      navigate("/");
+    const result = await authContext.register(formData);
+    if (result.success) {
+      setSuccess(true);
+      setTimeout(() => {
+        navigate("/");
+      }, 2000);
     } else {
-      setError("Registration failed. Please try again.");
+      if (result.error === "User already exists") {
+        setError("User already exists with this email");
+      } else if (
+        result.error?.includes("failed") ||
+        result.error?.includes("fetch")
+      ) {
+        setError("Server error, try again later");
+      } else {
+        setError("Something went wrong");
+      }
     }
   };
 
   return (
     <div className="flex flex-col min-h-screen w-screen items-center justify-center bg-[#1c1c1c] relative overflow-y-auto overflow-x-hidden py-10 scroll-smooth">
-      {/* Background Atmosphere */}
       <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-600/10 blur-[120px] rounded-full pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-emerald-500/5 blur-[120px] rounded-full pointer-events-none" />
 
@@ -71,9 +81,26 @@ const Register = () => {
           </div>
 
           {error && (
-            <div className="mb-6 p-4 bg-rose-500/10 border border-rose-500/30 rounded-2xl animate-shake">
-              <p className="text-rose-400 text-xs sm:text-sm font-semibold text-center">
-                {error}
+            <div className="mb-6 p-4 bg-rose-500/10 border border-rose-500/30 rounded-2xl animate-shake relative group">
+              <div className="flex items-center gap-3 pr-8 justify-center">
+                <p className="text-rose-400 text-xs sm:text-sm font-semibold text-center">
+                  {error}
+                </p>
+              </div>
+              <button
+                onClick={() => setError("")}
+                className="absolute top-1/2 -translate-y-1/2 right-3 w-6 h-6 rounded-lg bg-rose-500/10 flex items-center justify-center text-rose-500 hover:bg-rose-500 hover:text-white transition-all duration-300 cursor-pointer"
+                title="Close"
+              >
+                <span className="text-lg leading-none">&times;</span>
+              </button>
+            </div>
+          )}
+
+          {success && (
+            <div className="mb-6 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl">
+              <p className="text-emerald-400 text-xs sm:text-sm font-semibold text-center">
+                ✓ Registration successful! Redirecting to login...
               </p>
             </div>
           )}

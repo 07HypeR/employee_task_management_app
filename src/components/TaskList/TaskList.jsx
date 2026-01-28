@@ -4,10 +4,8 @@ import NewTask from "./NewTask";
 import CompleteTask from "./CompleteTask";
 import FailedTask from "./FailedTask";
 
-const TaskList = ({ data }) => {
-  useEffect(() => {
-    console.log("📋 TaskList received data:", data);
-  }, [data]);
+const TaskList = ({ data, onTaskUpdate }) => {
+  const tasks = data?.tasks || [];
 
   return (
     <div className="mt-12">
@@ -32,18 +30,18 @@ const TaskList = ({ data }) => {
         id="taskList"
         className="h-auto overflow-x-auto flex items-start justify-start w-full pb-8 gap-6 scroll-smooth custom-scrollbar"
       >
-        {data.tasks.map((elem, idx) => {
+        {tasks.map((elem, idx) => {
           if (elem.active) {
             return (
-              <div key={idx} className="shrink-0 w-[320px]">
-                <AcceptTask data={elem} />
+              <div key={elem._id || idx} className="shrink-0 w-[320px]">
+                <AcceptTask data={elem} onUpdate={onTaskUpdate} />
               </div>
             );
           }
           if (elem.newTask) {
             return (
-              <div key={idx} className="shrink-0 w-[320px]">
-                <NewTask data={elem} />
+              <div key={elem._id || idx} className="shrink-0 w-[320px]">
+                <NewTask data={elem} onUpdate={onTaskUpdate} />
               </div>
             );
           }

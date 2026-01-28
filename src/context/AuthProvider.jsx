@@ -1,146 +1,119 @@
 import React, { createContext, useEffect, useState } from "react";
-import { getLocalStorage, setLocalStorage } from "../utils/LocalStorage";
+import { authAPI, tasksAPI, usersAPI } from "../services/api";
 
 export const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
   const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Only initialize localStorage if it's empty (first time load)
-    // This prevents overwriting user data on refresh
-    const existingEmployees = localStorage.getItem("employees");
-    const existingAdmin = localStorage.getItem("admin");
+    const token = localStorage.getItem("token");
+    const user = localStorage.getItem("user");
 
-    if (!existingEmployees || !existingAdmin) {
-      // First time - set initial data
-      setLocalStorage();
-    }
-
-    // Load data from localStorage
-    const { employees, admin } = getLocalStorage();
-    setUserData({ employees, admin });
-
-    // Listen for changes from other tabs
-    const handleStorageChange = (e) => {
-      if (e.key === "employees" || e.key === "admin") {
-        const { employees, admin } = getLocalStorage();
-        setUserData({ employees, admin });
+    if (token && user) {
+      try {
+        const parsedUser = JSON.parse(user);
+        setUserData(parsedUser);
+      } catch (error) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
       }
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
+    }
+    setLoading(false);
   }, []);
 
-  const updateEmployees = (updatedEmployees) => {
-    // Get the current admin from localStorage (not state, as it might be stale)
-    const currentAdmin = JSON.parse(localStorage.getItem("admin")) || [];
+  const login = async (email, password) => {
+    try {
+      const data = await authAPI.login(email, password);
 
-    // Update state
-    setUserData({ employees: updatedEmployees, admin: currentAdmin });
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data));
 
-    // Also update localStorage to persist the changes
-    localStorage.setItem("employees", JSON.stringify(updatedEmployees));
-
-    console.log("✅ Saved to localStorage:", updatedEmployees);
-  };
-
-  const registerUser = (userData) => {
-    const { role, fname, lname, email, password } = userData;
-    const { employees, admin } = getLocalStorage();
-
-    if (role === "employee") {
-      const newUser = {
-        id: employees.length + 1,
-        fname,
-        lname,
-        email,
-        password,
-        taskNumbers: { active: 0, newTask: 0, completed: 0, failed: 0 },
-        tasks: [],
-      };
-      const updatedEmployees = [...employees, newUser];
-      setUserData({ employees: updatedEmployees, admin });
-      localStorage.setItem("employees", JSON.stringify(updatedEmployees));
-    } else if (role === "admin") {
-      const newAdmin = {
-        id: admin.length + 1,
-        fname,
-        lname,
-        email,
-        password,
-      };
-      const updatedAdmin = [...admin, newAdmin];
-      setUserData({ employees, admin: updatedAdmin });
-      localStorage.setItem("admin", JSON.stringify(updatedAdmin));
+      setUserData(data);
+      return { success: true, data };
+    } catch (error) {
+      return { success: false, error: error.message };
     }
-    return true;
   };
 
-  const updateTaskStatus = (employeeEmail, taskTitle, newStatus) => {
-    const { employees, admin } = getLocalStorage();
-    const employeeIndex = employees.findIndex(
-      (emp) => emp.email === employeeEmail,
-    );
+  const register = async (userData) => {
+    try {
+      const data = await authAPI.register(userData);
+      return { success: true, data };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  };
 
-    if (employeeIndex !== -1) {
-      const updatedEmployees = [...employees];
-      const employee = { ...updatedEmployees[employeeIndex] };
-      const taskIndex = employee.tasks.findIndex((t) => t.title === taskTitle);
+  const logout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    localStorage.removeItem("loggedInUser");
+    setUserData(null);
+  };
 
-      if (taskIndex !== -1) {
-        const updatedTasks = [...employee.tasks];
-        const task = { ...updatedTasks[taskIndex] };
+  const refreshUserData = async () => {
+    try {
+      const data = await authAPI.getProfile();
+      localStorage.setItem("user", JSON.stringify(data));
+      setUserData(data);
+      return data;
+    } catch (error) {
+      throw error;
+    }
+  };
 
-        // Reset all status flags
-        task.active = false;
-        task.newTask = false;
-        task.completed = false;
-        task.failed = false;
+  const getAllEmployees = async () => {
+    try {
+      return await usersAPI.getEmployees();
+    } catch (error) {
+      throw error;
+    }
+  };
 
-        // Apply new status
-        if (newStatus === "accepted") task.active = true;
-        if (newStatus === "completed") task.completed = true;
-        if (newStatus === "failed") task.failed = true;
+  const getUserTasks = async () => {
+    try {
+      return await tasksAPI.getAll();
+    } catch (error) {
+      throw error;
+    }
+  };
 
-        updatedTasks[taskIndex] = task;
-        employee.tasks = updatedTasks;
+  const createTask = async (taskData) => {
+    try {
+      const newTask = await tasksAPI.create(taskData);
+      return { success: true, data: newTask };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  };
 
-        // Recalculate task numbers
-        employee.taskNumbers = {
-          active: updatedTasks.filter((t) => t.active).length,
-          newTask: updatedTasks.filter((t) => t.newTask).length,
-          completed: updatedTasks.filter((t) => t.completed).length,
-          failed: updatedTasks.filter((t) => t.failed).length,
-        };
-
-        updatedEmployees[employeeIndex] = employee;
-        setUserData({ employees: updatedEmployees, admin });
-        localStorage.setItem("employees", JSON.stringify(updatedEmployees));
-
-        // Also update loggedInUser if it's the current user
-        const loggedInUserStr = localStorage.getItem("loggedInUser");
-        if (loggedInUserStr) {
-          const loggedInUser = JSON.parse(loggedInUserStr);
-          if (loggedInUser.data.email === employeeEmail) {
-            localStorage.setItem(
-              "loggedInUser",
-              JSON.stringify({
-                ...loggedInUser,
-                data: employee,
-              }),
-            );
-          }
-        }
-      }
+  const updateTaskStatus = async (taskId, action) => {
+    try {
+      const updatedTask = await tasksAPI.updateStatus(taskId, action);
+      await refreshUserData();
+      return { success: true, data: updatedTask };
+    } catch (error) {
+      return { success: false, error: error.message };
     }
   };
 
   return (
     <div>
       <AuthContext.Provider
-        value={{ ...userData, updateEmployees, registerUser, updateTaskStatus }}
+        value={{
+          user: userData,
+          loading,
+          login,
+          register,
+          logout,
+          refreshUserData,
+          getAllEmployees,
+          getUserTasks,
+          createTask,
+          updateTaskStatus,
+        }}
       >
         {children}
       </AuthContext.Provider>
