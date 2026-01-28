@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import Header from "../other/Header";
 import TasklistNumber from "../other/TasklistNumber";
 import TaskList from "../TaskList/TaskList";
+import TaskHistory from "../TaskList/TaskHistory";
 import { AuthContext } from "../../context/AuthProvider";
 
 const EmployeeDashboard = ({ data, changeUser }) => {
@@ -9,13 +10,9 @@ const EmployeeDashboard = ({ data, changeUser }) => {
   const [loading, setLoading] = useState(true);
   const authContext = useContext(AuthContext);
 
-  useEffect(() => {
-    fetchTasks();
-  }, []);
-
-  const fetchTasks = async () => {
+  const fetchTasks = async (isInitial = false) => {
     try {
-      setLoading(true);
+      if (isInitial) setLoading(true);
       const tasksData = await authContext.getUserTasks();
       setTasks(tasksData);
       setLoading(false);
@@ -23,6 +20,10 @@ const EmployeeDashboard = ({ data, changeUser }) => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchTasks(true);
+  }, []);
 
   // Calculate counts dynamically from tasks to ensure sync
   const taskNumbers = {
@@ -58,6 +59,7 @@ const EmployeeDashboard = ({ data, changeUser }) => {
         <Header data={dashboardData} changeUser={changeUser} />
         <TasklistNumber data={dashboardData} />
         <TaskList data={dashboardData} onTaskUpdate={fetchTasks} />
+        <TaskHistory data={dashboardData} />
       </div>
     </div>
   );

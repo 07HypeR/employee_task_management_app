@@ -165,7 +165,7 @@ const AdminEmployeeTasks = ({ changeUser }) => {
           <div className="flex items-center gap-4">
             <button
               onClick={() => navigate("/")}
-              className="group p-3 rounded-2xl bg-white/5 hover:bg-emerald-500/10 border border-white/5 hover:border-emerald-500/20 transition-all duration-300"
+              className="group p-3 rounded-2xl bg-white/5 hover:bg-emerald-500/10 border border-white/5 hover:border-emerald-500/20 transition-all duration-300 cursor-pointer"
             >
               <svg
                 className="w-6 h-6 text-slate-400 group-hover:text-emerald-500 transition-colors"

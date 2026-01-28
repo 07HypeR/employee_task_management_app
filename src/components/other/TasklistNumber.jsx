@@ -5,32 +5,32 @@ const TasklistNumber = ({ data }) => {
   const stats = [
     {
       label: "New Tasks",
-      count: data.taskNumbers.newTask,
+      count: data?.taskNumbers?.newTask || 0,
       gradient: "from-emerald-400 to-emerald-600",
       path: "/tasks/new",
     },
     {
       label: "Accepted",
-      count: data.taskNumbers.active,
+      count: data?.taskNumbers?.active || 0,
       gradient: "from-amber-400 to-orange-500",
       path: "/tasks/accepted",
     },
     {
       label: "Declined",
-      count: data.taskNumbers.declined,
+      count: data?.taskNumbers?.declined || 0,
       gradient: "from-slate-500 to-slate-700",
       path: "/tasks/declined",
     },
     {
       label: "Completed",
-      count: data.taskNumbers.completed,
+      count: data?.taskNumbers?.completed || 0,
       gradient: "from-emerald-500 to-teal-500",
       path: "/tasks/completed",
     },
 
     {
       label: "Failed",
-      count: data.taskNumbers.failed,
+      count: data?.taskNumbers?.failed || 0,
       gradient: "from-rose-500 to-red-600",
       path: "/tasks/failed",
     },

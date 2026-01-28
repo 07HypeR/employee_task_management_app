@@ -48,22 +48,11 @@ export const authAPI = {
 
 // Tasks API
 export const tasksAPI = {
-  getAll: (status = null) => {
-    const endpoint = status ? `/tasks?status=${status}` : "/tasks";
-    return apiCall(endpoint);
-  },
-
-  getById: (id) => apiCall(`/tasks/${id}`),
+  getAll: () => apiCall("/tasks"),
 
   create: (taskData) =>
     apiCall("/tasks", {
       method: "POST",
-      body: JSON.stringify(taskData),
-    }),
-
-  update: (id, taskData) =>
-    apiCall(`/tasks/${id}`, {
-      method: "PUT",
       body: JSON.stringify(taskData),
     }),
 
@@ -72,33 +61,9 @@ export const tasksAPI = {
       method: "PATCH",
       body: JSON.stringify({ action }),
     }),
-
-  delete: (id) =>
-    apiCall(`/tasks/${id}`, {
-      method: "DELETE",
-    }),
-
-  getByEmployee: (employeeId) => apiCall(`/tasks/employee/${employeeId}`),
 };
 
 // Users API
 export const usersAPI = {
-  getAll: () => apiCall("/users"),
-
   getEmployees: () => apiCall("/users/employees"),
-
-  getById: (id) => apiCall(`/users/${id}`),
-
-  getWithTasks: (id) => apiCall(`/users/${id}/with-tasks`),
-
-  update: (id, userData) =>
-    apiCall(`/users/${id}`, {
-      method: "PUT",
-      body: JSON.stringify(userData),
-    }),
-
-  delete: (id) =>
-    apiCall(`/users/${id}`, {
-      method: "DELETE",
-    }),
 };

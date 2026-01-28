@@ -2,11 +2,7 @@ import React, { useContext, useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthProvider";
 import Header from "../components/other/Header";
-import AcceptTask from "../components/TaskList/AcceptTask";
-import NewTask from "../components/TaskList/NewTask";
-import CompleteTask from "../components/TaskList/CompleteTask";
-import FailedTask from "../components/TaskList/FailedTask";
-import DeclineTask from "../components/TaskList/DeclineTask";
+import TaskCard from "../components/TaskList/TaskCard";
 
 const TaskPage = ({ changeUser }) => {
   const { type } = useParams();
@@ -65,21 +61,6 @@ const TaskPage = ({ changeUser }) => {
     }
   };
 
-  const renderTask = (task, idx) => {
-    const taskProps = {
-      data: task,
-      onUpdate: fetchTasks,
-    };
-
-    if (task.active) return <AcceptTask key={task._id || idx} {...taskProps} />;
-    if (task.newTask) return <NewTask key={task._id || idx} {...taskProps} />;
-    if (task.completed)
-      return <CompleteTask key={task._id || idx} data={task} />;
-    if (task.failed) return <FailedTask key={task._id || idx} data={task} />;
-    if (task.declined) return <DeclineTask key={task._id || idx} data={task} />;
-    return null;
-  };
-
   if (!authContext.user || authContext.user.role !== "employee") {
     navigate("/");
     return null;
@@ -88,56 +69,82 @@ const TaskPage = ({ changeUser }) => {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#1c1c1c] flex items-center justify-center">
-        <div className="text-emerald-500 text-xl">Loading tasks...</div>
+        <div className="text-emerald-500 text-xl font-bold animate-pulse">
+          Loading Tasks...
+        </div>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-[#1c1c1c] p-4 sm:p-10 relative overflow-hidden selection:bg-emerald-500/30">
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-600/5 blur-[120px] rounded-full" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-emerald-500/5 blur-[120px] rounded-full" />
+      {/* Background Atmosphere */}
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-600/5 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-emerald-500/5 blur-[120px] rounded-full pointer-events-none" />
 
       <div className="relative z-10 max-w-7xl mx-auto">
         <Header data={authContext.user} changeUser={changeUser} />
 
-        <div className="mb-8 flex items-center gap-4">
-          <button
-            onClick={() => navigate(-1)}
-            className="p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all text-slate-400 hover:text-white"
-          >
-            ← Back
-          </button>
-          <h1 className="text-3xl font-bold">{getPageTitle()}</h1>
-          <div className="ml-auto flex items-center gap-3 bg-emerald-600/10 backdrop-blur-2xl px-4 py-2 rounded-full border border-emerald-500/10">
-            <div className="w-2 h-2 rounded-full bg-emerald-500" />
-            <span className="text-[10px] text-emerald-400 font-bold uppercase tracking-widest">
-              {tasks.length} {tasks.length === 1 ? "Task" : "Tasks"}
+        <div className="mt-8 mb-12 flex flex-col sm:flex-row sm:items-center gap-6">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => navigate("/")}
+              className="group p-3 rounded-2xl bg-white/5 hover:bg-emerald-500/10 border border-white/5 hover:border-emerald-500/20 transition-all duration-300 cursor-pointer"
+            >
+              <svg
+                className="w-6 h-6 text-slate-400 group-hover:text-emerald-500 transition-colors"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                />
+              </svg>
+            </button>
+            <div>
+              <h1 className="text-3xl font-black text-white tracking-tight">
+                {getPageTitle()}
+              </h1>
+              <p className="text-slate-500 text-sm font-medium">
+                Viewing your categorized assignments
+              </p>
+            </div>
+          </div>
+
+          <div className="sm:ml-auto w-fit flex items-center gap-3 bg-emerald-500/10 backdrop-blur-2xl px-5 py-2.5 rounded-2xl border border-emerald-500/10 shadow-lg shadow-emerald-500/5">
+            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-xs text-emerald-500 font-black uppercase tracking-widest">
+              {tasks.length} {tasks.length === 1 ? "Assignment" : "Assignments"}
             </span>
           </div>
         </div>
 
         {tasks.length === 0 ? (
-          <div className="bg-[#111111]/60 backdrop-blur-2xl p-20 rounded-3xl border border-white/5 text-center">
-            <div className="mb-4 text-6xl opacity-20">📭</div>
-            <p className="text-slate-500 text-lg mb-2">
-              No tasks found in this category.
-            </p>
-            <p className="text-slate-600 text-sm">
+          <div className="bg-[#111111]/40 backdrop-blur-2xl py-24 rounded-[3rem] border border-white/5 text-center shadow-2xl">
+            <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6 border border-white/5">
+              <span className="text-4xl opacity-40">📬</span>
+            </div>
+            <h3 className="text-white text-xl font-bold mb-2">
+              Category Empty
+            </h3>
+            <p className="text-slate-500 max-w-md mx-auto px-6">
               {type === "new" &&
-                "You don't have any new tasks assigned to you."}
-              {type === "accepted" && "You haven't accepted any tasks yet."}
-              {type === "completed" && "You haven't completed any tasks yet."}
-              {type === "failed" && "You don't have any failed tasks."}
-              {type === "declined" && "You haven't declined any tasks."}
+                "You don't have any new tasks assigned at the moment."}
+              {type === "accepted" && "No tasks are currently in progress."}
+              {type === "completed" && "You haven't finished any tasks yet."}
+              {type === "failed" && "Great job! You have no failed tasks."}
+              {type === "declined" &&
+                "You haven't declined any incoming requests."}
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {tasks.map((task, idx) => (
-              <div key={task._id || idx} className="w-full">
-                {renderTask(task, idx)}
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {tasks.map((task) => (
+              <TaskCard key={task._id} task={task} onUpdate={fetchTasks} />
             ))}
           </div>
         )}
