@@ -6,25 +6,51 @@ import socketService from "@services/socket";
 
 const EmployeeDashboard = ({ data, changeUser }) => {
   const { tasks, tasksLoading, fetchTasks } = useTasks();
+  const userId = data?._id; // Extract stable user ID
 
   useEffect(() => {
+    console.log(
+      "🏠 EmployeeDashboard: Setting up socket listeners for user:",
+      userId,
+    );
+
     // Fetch tasks only once on mount
     fetchTasks();
 
     // Listen for real-time task updates
     const handleTaskCreated = (task) => {
-      console.log("🆕 Dashboard: New task created:", task);
+      console.log("🆕 EmployeeDashboard: New task created:", task);
+      console.log(
+        "🔍 Checking if task is for user:",
+        userId,
+        "Task assigned to:",
+        task.assignedTo?._id,
+      );
+
       // Check if this task is assigned to current user
-      if (data && task.assignedTo?._id === data._id) {
+      if (userId && task.assignedTo?._id === userId) {
+        console.log("✅ Task is for this user, refreshing tasks...");
         fetchTasks(); // Refresh tasks
+      } else {
+        console.log("⏭️ Task not for this user, skipping refresh");
       }
     };
 
     const handleTaskUpdated = (task) => {
-      console.log("📝 Dashboard: Task updated:", task);
+      console.log("📝 EmployeeDashboard: Task updated:", task);
+      console.log(
+        "🔍 Checking if task belongs to user:",
+        userId,
+        "Task assigned to:",
+        task.assignedTo?._id,
+      );
+
       // Check if this task belongs to current user
-      if (data && task.assignedTo?._id === data._id) {
+      if (userId && task.assignedTo?._id === userId) {
+        console.log("✅ Task belongs to this user, refreshing tasks...");
         fetchTasks(); // Refresh tasks
+      } else {
+        console.log("⏭️ Task not for this user, skipping refresh");
       }
     };
 
@@ -33,10 +59,11 @@ const EmployeeDashboard = ({ data, changeUser }) => {
 
     // Cleanup listeners on unmount
     return () => {
+      console.log("🧹 EmployeeDashboard: Cleaning up socket listeners");
       socketService.off("taskCreated", handleTaskCreated);
       socketService.off("taskUpdated", handleTaskUpdated);
     };
-  }, [data]);
+  }, [userId, fetchTasks]); // Stable dependencies
 
   // Calculate task counts only when tasks array changes
   const taskCounts = useMemo(() => {
