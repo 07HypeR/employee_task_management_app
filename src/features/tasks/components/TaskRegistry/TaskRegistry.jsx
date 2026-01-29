@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTasks } from "@hooks/useApi";
 import socketService from "@services/socket";
@@ -149,6 +149,7 @@ const AllTask = () => {
   const { tasks, tasksLoading, fetchTasks } = useTasks();
   const [selectedTask, setSelectedTask] = useState(null);
   const [filter, setFilter] = useState("All");
+  const fetchDebounceTimerRef = useRef(null); // Use ref for timer
 
   const filterOptions = [
     { label: "All", value: "All" },
@@ -159,22 +160,20 @@ const AllTask = () => {
     { label: "Completed", value: "completed" },
   ];
 
+  // Stable debounced fetch function
+  const debouncedFetchTasks = useCallback(() => {
+    if (fetchDebounceTimerRef.current) {
+      clearTimeout(fetchDebounceTimerRef.current);
+    }
+
+    fetchDebounceTimerRef.current = setTimeout(() => {
+      console.log("⏰ Registry: Debounced fetch executing...");
+      fetchTasks();
+    }, 300);
+  }, [fetchTasks]);
+
   useEffect(() => {
     fetchTasks();
-
-    // Debounce timer to prevent rapid successive calls
-    let fetchDebounceTimer = null;
-
-    const debouncedFetchTasks = () => {
-      if (fetchDebounceTimer) {
-        clearTimeout(fetchDebounceTimer);
-      }
-
-      fetchDebounceTimer = setTimeout(() => {
-        console.log("⏰ Registry: Debounced fetch executing...");
-        fetchTasks();
-      }, 300);
-    };
 
     // Listen for real-time task updates
     const handleTaskCreated = (task) => {
@@ -192,13 +191,13 @@ const AllTask = () => {
 
     // Cleanup listeners on unmount
     return () => {
-      if (fetchDebounceTimer) {
-        clearTimeout(fetchDebounceTimer);
+      if (fetchDebounceTimerRef.current) {
+        clearTimeout(fetchDebounceTimerRef.current);
       }
       socketService.off("taskCreated", handleTaskCreated);
       socketService.off("taskUpdated", handleTaskUpdated);
     };
-  }, []);
+  }, [debouncedFetchTasks]); // Only debouncedFetchTasks dependency
 
   const handleTaskClick = (task) => {
     setSelectedTask(task);

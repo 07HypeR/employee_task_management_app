@@ -4,18 +4,34 @@ import { useTasks } from "@hooks/useApi";
 const TaskCard = ({ task, onUpdate }) => {
   const { updateTaskStatus } = useTasks();
   const [loadingAction, setLoadingAction] = React.useState(null);
+  const [error, setError] = React.useState(null);
 
   const handleStatusUpdate = async (action) => {
     try {
+      console.log(
+        `🔄 TaskCard: Updating task ${task._id} with action: ${action}`,
+      );
       setLoadingAction(action);
+      setError(null); // Clear previous errors
+
       const result = await updateTaskStatus(task._id, action);
-      if (result.success && onUpdate) {
-        // Optional callback if parent needs to do something
-        onUpdate();
+
+      console.log(`✅ TaskCard: Update result:`, result);
+
+      if (result.success) {
+        console.log(`✅ TaskCard: Task ${task._id} updated successfully`);
+        if (onUpdate) {
+          onUpdate();
+        }
+      } else {
+        console.error(`❌ TaskCard: Update failed:`, result.error);
+        setError(result.error || "Failed to update task");
       }
     } catch (error) {
-      console.error("Failed to update status", error);
+      console.error("❌ TaskCard: Exception during update:", error);
+      setError(error.message || "An unexpected error occurred");
     } finally {
+      console.log(`🏁 TaskCard: Clearing loading state`);
       setLoadingAction(null);
     }
   };
@@ -89,9 +105,16 @@ const TaskCard = ({ task, onUpdate }) => {
       <h4 className="text-lg font-bold text-white mb-2 leading-tight group-hover:text-emerald-400 transition-colors">
         {task.title}
       </h4>
-      <p className="text-gray-400 text-sm line-clamp-3 mb-6 leading-relaxed flex-grow">
+      <p className="text-gray-400 text-sm line-clamp-3 mb-2 leading-relaxed flex-grow">
         {task.description}
       </p>
+
+      {/* Error Message */}
+      {error && (
+        <div className="mb-4 p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl">
+          <p className="text-rose-500 text-xs font-medium">{error}</p>
+        </div>
+      )}
 
       <div className="flex flex-col gap-4">
         {task.assignedBy && (

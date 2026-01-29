@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useRef, useCallback } from "react";
 import { Header, TaskStatistics } from "@components/layout";
 import { TaskList, TaskHistory } from "@features/tasks";
 import { useTasks } from "@hooks/useApi";
@@ -7,6 +7,21 @@ import socketService from "@services/socket";
 const EmployeeDashboard = ({ data, changeUser }) => {
   const { tasks, tasksLoading, fetchTasks } = useTasks();
   const userId = data?._id; // Extract stable user ID
+  const fetchDebounceTimerRef = useRef(null); // Use ref for timer
+
+  // Stable debounced fetch function
+  const debouncedFetchTasks = useCallback(() => {
+    // Clear any existing timer
+    if (fetchDebounceTimerRef.current) {
+      clearTimeout(fetchDebounceTimerRef.current);
+    }
+
+    // Set new timer to fetch after 300ms
+    fetchDebounceTimerRef.current = setTimeout(() => {
+      console.log("⏰ Debounced fetch executing...");
+      fetchTasks();
+    }, 300);
+  }, [fetchTasks]); // fetchTasks dependency is OK here since it's wrapped in useCallback
 
   useEffect(() => {
     console.log(
@@ -16,22 +31,6 @@ const EmployeeDashboard = ({ data, changeUser }) => {
 
     // Fetch tasks only once on mount
     fetchTasks();
-
-    // Debounce timer to prevent rapid successive calls
-    let fetchDebounceTimer = null;
-
-    const debouncedFetchTasks = () => {
-      // Clear any existing timer
-      if (fetchDebounceTimer) {
-        clearTimeout(fetchDebounceTimer);
-      }
-
-      // Set new timer to fetch after 300ms
-      fetchDebounceTimer = setTimeout(() => {
-        console.log("⏰ Debounced fetch executing...");
-        fetchTasks();
-      }, 300);
-    };
 
     // Listen for real-time task updates
     const handleTaskCreated = (task) => {
@@ -76,13 +75,13 @@ const EmployeeDashboard = ({ data, changeUser }) => {
     // Cleanup listeners on unmount
     return () => {
       console.log("🧹 EmployeeDashboard: Cleaning up socket listeners");
-      if (fetchDebounceTimer) {
-        clearTimeout(fetchDebounceTimer);
+      if (fetchDebounceTimerRef.current) {
+        clearTimeout(fetchDebounceTimerRef.current);
       }
       socketService.off("taskCreated", handleTaskCreated);
       socketService.off("taskUpdated", handleTaskUpdated);
     };
-  }, [userId, fetchTasks]); // Stable dependencies
+  }, [userId, debouncedFetchTasks]); // Only userId and stable debouncedFetchTasks
 
   // Calculate task counts only when tasks array changes
   const taskCounts = useMemo(() => {
