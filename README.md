@@ -2,8 +2,6 @@
 
 A premium, real-time task management ecosystem designed for high-performance teams. Built with a focus on **visual excellence**, **real-time synchronization**, and **seamless UX**.
 
-![Dashboard Preview](https://github.com/07HypeR/employee_task_management_app/raw/main/public/preview.png)
-
 ### 🛡️ Authentication
 
 Experience a sleek, modern entry point for your team.
