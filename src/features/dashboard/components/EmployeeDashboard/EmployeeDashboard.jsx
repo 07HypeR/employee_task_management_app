@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useCallback } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { Header, TaskStatistics } from "@components/layout";
 import { TaskList, TaskHistory } from "@features/tasks";
 import { useTasks } from "@hooks/useApi";
@@ -6,22 +6,14 @@ import socketService from "@services/socket";
 
 const EmployeeDashboard = ({ data, changeUser }) => {
   const { tasks, tasksLoading, fetchTasks } = useTasks();
-  const userId = data?._id; // Extract stable user ID
-  const fetchDebounceTimerRef = useRef(null); // Use ref for timer
+  const userId = data?._id;
+  const fetchDebounceTimerRef = useRef(null);
+  const fetchTasksRef = useRef(fetchTasks); // Store fetchTasks in ref
 
-  // Stable debounced fetch function
-  const debouncedFetchTasks = useCallback(() => {
-    // Clear any existing timer
-    if (fetchDebounceTimerRef.current) {
-      clearTimeout(fetchDebounceTimerRef.current);
-    }
-
-    // Set new timer to fetch after 300ms
-    fetchDebounceTimerRef.current = setTimeout(() => {
-      console.log("⏰ Debounced fetch executing...");
-      fetchTasks();
-    }, 300);
-  }, [fetchTasks]); // fetchTasks dependency is OK here since it's wrapped in useCallback
+  // Update ref when fetchTasks changes
+  useEffect(() => {
+    fetchTasksRef.current = fetchTasks;
+  }, [fetchTasks]);
 
   useEffect(() => {
     console.log(
@@ -30,7 +22,19 @@ const EmployeeDashboard = ({ data, changeUser }) => {
     );
 
     // Fetch tasks only once on mount
-    fetchTasks();
+    fetchTasksRef.current();
+
+    // Debounced fetch that uses ref
+    const debouncedFetchTasks = () => {
+      if (fetchDebounceTimerRef.current) {
+        clearTimeout(fetchDebounceTimerRef.current);
+      }
+
+      fetchDebounceTimerRef.current = setTimeout(() => {
+        console.log("⏰ Debounced fetch executing...");
+        fetchTasksRef.current(); // Use ref instead of direct fetchTasks
+      }, 300);
+    };
 
     // Listen for real-time task updates
     const handleTaskCreated = (task) => {
@@ -42,10 +46,9 @@ const EmployeeDashboard = ({ data, changeUser }) => {
         task.assignedTo?._id,
       );
 
-      // Check if this task is assigned to current user
       if (userId && task.assignedTo?._id === userId) {
         console.log("✅ Task is for this user, refreshing tasks...");
-        debouncedFetchTasks(); // Debounced refresh
+        debouncedFetchTasks();
       } else {
         console.log("⏭️ Task not for this user, skipping refresh");
       }
@@ -60,10 +63,9 @@ const EmployeeDashboard = ({ data, changeUser }) => {
         task.assignedTo?._id,
       );
 
-      // Check if this task belongs to current user
       if (userId && task.assignedTo?._id === userId) {
         console.log("✅ Task belongs to this user, refreshing tasks...");
-        debouncedFetchTasks(); // Debounced refresh
+        debouncedFetchTasks();
       } else {
         console.log("⏭️ Task not for this user, skipping refresh");
       }
@@ -81,7 +83,7 @@ const EmployeeDashboard = ({ data, changeUser }) => {
       socketService.off("taskCreated", handleTaskCreated);
       socketService.off("taskUpdated", handleTaskUpdated);
     };
-  }, [userId, debouncedFetchTasks]); // Only userId and stable debouncedFetchTasks
+  }, [userId]); // ONLY userId - no functions!
 
   // Calculate task counts only when tasks array changes
   const taskCounts = useMemo(() => {

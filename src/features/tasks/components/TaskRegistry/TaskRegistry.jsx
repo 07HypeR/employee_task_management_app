@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTasks } from "@hooks/useApi";
 import socketService from "@services/socket";
@@ -149,7 +149,8 @@ const AllTask = () => {
   const { tasks, tasksLoading, fetchTasks } = useTasks();
   const [selectedTask, setSelectedTask] = useState(null);
   const [filter, setFilter] = useState("All");
-  const fetchDebounceTimerRef = useRef(null); // Use ref for timer
+  const fetchDebounceTimerRef = useRef(null);
+  const fetchTasksRef = useRef(fetchTasks); // Store fetchTasks in ref
 
   const filterOptions = [
     { label: "All", value: "All" },
@@ -160,30 +161,35 @@ const AllTask = () => {
     { label: "Completed", value: "completed" },
   ];
 
-  // Stable debounced fetch function
-  const debouncedFetchTasks = useCallback(() => {
-    if (fetchDebounceTimerRef.current) {
-      clearTimeout(fetchDebounceTimerRef.current);
-    }
-
-    fetchDebounceTimerRef.current = setTimeout(() => {
-      console.log("⏰ Registry: Debounced fetch executing...");
-      fetchTasks();
-    }, 300);
+  // Update ref when fetchTasks changes
+  useEffect(() => {
+    fetchTasksRef.current = fetchTasks;
   }, [fetchTasks]);
 
   useEffect(() => {
-    fetchTasks();
+    fetchTasksRef.current();
+
+    // Debounced fetch that uses ref
+    const debouncedFetchTasks = () => {
+      if (fetchDebounceTimerRef.current) {
+        clearTimeout(fetchDebounceTimerRef.current);
+      }
+
+      fetchDebounceTimerRef.current = setTimeout(() => {
+        console.log("⏰ Registry: Debounced fetch executing...");
+        fetchTasksRef.current(); // Use ref instead of direct fetchTasks
+      }, 300);
+    };
 
     // Listen for real-time task updates
     const handleTaskCreated = (task) => {
       console.log("🆕 Registry: New task created:", task);
-      debouncedFetchTasks(); // Debounced refresh
+      debouncedFetchTasks();
     };
 
     const handleTaskUpdated = (task) => {
       console.log("📝 Registry: Task updated:", task);
-      debouncedFetchTasks(); // Debounced refresh
+      debouncedFetchTasks();
     };
 
     socketService.onTaskCreated(handleTaskCreated);
@@ -197,7 +203,7 @@ const AllTask = () => {
       socketService.off("taskCreated", handleTaskCreated);
       socketService.off("taskUpdated", handleTaskUpdated);
     };
-  }, [debouncedFetchTasks]); // Only debouncedFetchTasks dependency
+  }, []); // Empty dependency array - runs once on mount
 
   const handleTaskClick = (task) => {
     setSelectedTask(task);
