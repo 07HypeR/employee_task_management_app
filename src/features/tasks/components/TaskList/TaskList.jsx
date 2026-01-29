@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import TaskCard from "../TaskCard/TaskCard";
 
 const ClockIcon = () => (
@@ -60,12 +60,18 @@ const NavButton = ({ direction, onClick }) => (
   </button>
 );
 
-const ScrollContainer = ({ items, onTaskUpdate, emptyMessage }) => {
+const ScrollContainer = ({
+  items,
+  onTaskUpdate,
+  emptyMessage,
+  visibleCount,
+  onShowMore,
+  onCollapse,
+}) => {
   const scrollRef = useRef(null);
 
   const scroll = (direction) => {
     if (scrollRef.current) {
-      // Get the width of the container to scroll by exactly one view's width
       const scrollAmount = scrollRef.current.clientWidth;
       scrollRef.current.scrollBy({
         left: direction === "left" ? -scrollAmount : scrollAmount,
@@ -82,41 +88,85 @@ const ScrollContainer = ({ items, onTaskUpdate, emptyMessage }) => {
     );
   }
 
+  const visibleItems = items.slice(0, visibleCount);
+  const hasMore = visibleCount < items.length;
+  const isFullyExpanded = visibleCount >= items.length && items.length > 5;
+
   return (
-    <div className="relative group/scroll">
-      {/* Scroll Controls */}
-      <div className="absolute -top-16 right-0 flex gap-2 sm:opacity-0 group-hover/scroll:opacity-100 transition-opacity duration-300">
-        <NavButton direction="left" onClick={() => scroll("left")} />
-        <NavButton direction="right" onClick={() => scroll("right")} />
+    <div className="space-y-4">
+      <div className="relative group/scroll">
+        <div className="absolute -top-16 right-0 flex gap-2 sm:opacity-0 group-hover/scroll:opacity-100 transition-opacity duration-300">
+          <NavButton direction="left" onClick={() => scroll("left")} />
+          <NavButton direction="right" onClick={() => scroll("right")} />
+        </div>
+
+        <div
+          ref={scrollRef}
+          className="flex overflow-x-auto gap-4 sm:gap-6 pb-8 snap-x snap-mandatory scroll-smooth no-scrollbar"
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        >
+          {visibleItems.map((task) => (
+            <div
+              key={task._id}
+              className="snap-start shrink-0 w-full sm:w-[350px]"
+            >
+              <TaskCard task={task} onUpdate={onTaskUpdate} />
+            </div>
+          ))}
+        </div>
       </div>
 
-      <div
-        ref={scrollRef}
-        className="flex overflow-x-auto gap-4 sm:gap-6 pb-8 snap-x snap-mandatory scroll-smooth no-scrollbar"
-        style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-      >
-        {items.map((task) => (
-          <div
-            key={task._id}
-            className="snap-start shrink-0 w-full sm:w-[350px]"
+      {hasMore && (
+        <div className="flex justify-center pt-4">
+          <button
+            onClick={onShowMore}
+            className="px-6 py-3 bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-500 font-bold text-sm rounded-xl border border-emerald-500/20 hover:border-emerald-500/30 transition-all active:scale-95 flex items-center gap-2"
           >
-            <TaskCard task={task} onUpdate={onTaskUpdate} />
-          </div>
-        ))}
-      </div>
+            <span>Show More</span>
+            <span className="text-xs opacity-70">
+              ({items.length - visibleCount} remaining)
+            </span>
+          </button>
+        </div>
+      )}
+
+      {isFullyExpanded && (
+        <div className="flex justify-center pt-4">
+          <button
+            onClick={onCollapse}
+            className="px-6 py-3 bg-gray-600/10 hover:bg-gray-600/20 text-gray-400 hover:text-gray-300 font-bold text-sm rounded-xl border border-gray-500/20 hover:border-gray-500/30 transition-all active:scale-95 flex items-center gap-2"
+          >
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 15l7-7 7 7"
+              />
+            </svg>
+            <span>Collapse</span>
+          </button>
+        </div>
+      )}
     </div>
   );
 };
 
 const TaskList = ({ data, onTaskUpdate }) => {
   const tasks = data?.tasks || [];
+  const [pendingVisible, setPendingVisible] = useState(5);
+  const [activeVisible, setActiveVisible] = useState(5);
 
   const pending = tasks.filter((task) => task.newTask);
   const active = tasks.filter((task) => task.active);
 
   return (
     <div className="mt-16 space-y-16 pb-16">
-      {/* New Invitations Section */}
       <section>
         <div className="flex items-center gap-4 mb-8">
           <div className="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-500 border border-blue-500/10">
@@ -127,7 +177,7 @@ const TaskList = ({ data, onTaskUpdate }) => {
               New Invitations
             </h3>
             <p className="text-sm text-gray-500 font-medium">
-              Respond to incoming task assignments
+              Respond to incoming task assignments ({pending.length} total)
             </p>
           </div>
         </div>
@@ -136,10 +186,12 @@ const TaskList = ({ data, onTaskUpdate }) => {
           items={pending}
           onTaskUpdate={onTaskUpdate}
           emptyMessage="No new requests at the moment."
+          visibleCount={pendingVisible}
+          onShowMore={() => setPendingVisible((prev) => prev + 5)}
+          onCollapse={() => setPendingVisible(5)}
         />
       </section>
 
-      {/* Active Workload Section */}
       <section>
         <div className="flex items-center gap-4 mb-8">
           <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 border border-emerald-500/10">
@@ -150,7 +202,7 @@ const TaskList = ({ data, onTaskUpdate }) => {
               Active Workload
             </h3>
             <p className="text-sm text-gray-500 font-medium">
-              Tasks currently in progress
+              Tasks currently in progress ({active.length} total)
             </p>
           </div>
         </div>
@@ -159,6 +211,9 @@ const TaskList = ({ data, onTaskUpdate }) => {
           items={active}
           onTaskUpdate={onTaskUpdate}
           emptyMessage="Ready for more challenges? Accept a task above."
+          visibleCount={activeVisible}
+          onShowMore={() => setActiveVisible((prev) => prev + 5)}
+          onCollapse={() => setActiveVisible(5)}
         />
       </section>
     </div>
