@@ -17,6 +17,22 @@ const EmployeeDashboard = ({ data, changeUser }) => {
     // Fetch tasks only once on mount
     fetchTasks();
 
+    // Debounce timer to prevent rapid successive calls
+    let fetchDebounceTimer = null;
+
+    const debouncedFetchTasks = () => {
+      // Clear any existing timer
+      if (fetchDebounceTimer) {
+        clearTimeout(fetchDebounceTimer);
+      }
+
+      // Set new timer to fetch after 300ms
+      fetchDebounceTimer = setTimeout(() => {
+        console.log("⏰ Debounced fetch executing...");
+        fetchTasks();
+      }, 300);
+    };
+
     // Listen for real-time task updates
     const handleTaskCreated = (task) => {
       console.log("🆕 EmployeeDashboard: New task created:", task);
@@ -30,7 +46,7 @@ const EmployeeDashboard = ({ data, changeUser }) => {
       // Check if this task is assigned to current user
       if (userId && task.assignedTo?._id === userId) {
         console.log("✅ Task is for this user, refreshing tasks...");
-        fetchTasks(); // Refresh tasks
+        debouncedFetchTasks(); // Debounced refresh
       } else {
         console.log("⏭️ Task not for this user, skipping refresh");
       }
@@ -48,7 +64,7 @@ const EmployeeDashboard = ({ data, changeUser }) => {
       // Check if this task belongs to current user
       if (userId && task.assignedTo?._id === userId) {
         console.log("✅ Task belongs to this user, refreshing tasks...");
-        fetchTasks(); // Refresh tasks
+        debouncedFetchTasks(); // Debounced refresh
       } else {
         console.log("⏭️ Task not for this user, skipping refresh");
       }
@@ -60,6 +76,9 @@ const EmployeeDashboard = ({ data, changeUser }) => {
     // Cleanup listeners on unmount
     return () => {
       console.log("🧹 EmployeeDashboard: Cleaning up socket listeners");
+      if (fetchDebounceTimer) {
+        clearTimeout(fetchDebounceTimer);
+      }
       socketService.off("taskCreated", handleTaskCreated);
       socketService.off("taskUpdated", handleTaskUpdated);
     };

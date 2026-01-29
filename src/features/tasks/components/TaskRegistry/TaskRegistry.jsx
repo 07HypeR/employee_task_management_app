@@ -162,15 +162,29 @@ const AllTask = () => {
   useEffect(() => {
     fetchTasks();
 
+    // Debounce timer to prevent rapid successive calls
+    let fetchDebounceTimer = null;
+
+    const debouncedFetchTasks = () => {
+      if (fetchDebounceTimer) {
+        clearTimeout(fetchDebounceTimer);
+      }
+
+      fetchDebounceTimer = setTimeout(() => {
+        console.log("⏰ Registry: Debounced fetch executing...");
+        fetchTasks();
+      }, 300);
+    };
+
     // Listen for real-time task updates
     const handleTaskCreated = (task) => {
       console.log("🆕 Registry: New task created:", task);
-      fetchTasks(); // Refresh tasks
+      debouncedFetchTasks(); // Debounced refresh
     };
 
     const handleTaskUpdated = (task) => {
       console.log("📝 Registry: Task updated:", task);
-      fetchTasks(); // Refresh tasks
+      debouncedFetchTasks(); // Debounced refresh
     };
 
     socketService.onTaskCreated(handleTaskCreated);
@@ -178,6 +192,9 @@ const AllTask = () => {
 
     // Cleanup listeners on unmount
     return () => {
+      if (fetchDebounceTimer) {
+        clearTimeout(fetchDebounceTimer);
+      }
       socketService.off("taskCreated", handleTaskCreated);
       socketService.off("taskUpdated", handleTaskUpdated);
     };
