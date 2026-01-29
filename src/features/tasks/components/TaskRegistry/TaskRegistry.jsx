@@ -149,6 +149,7 @@ const AllTask = () => {
   const { tasks, tasksLoading, fetchTasks } = useTasks();
   const [selectedTask, setSelectedTask] = useState(null);
   const [filter, setFilter] = useState("All");
+  const [visibleCount, setVisibleCount] = useState(5);
   const fetchDebounceTimerRef = useRef(null);
   const fetchTasksRef = useRef(fetchTasks);
 
@@ -198,6 +199,11 @@ const AllTask = () => {
     };
   }, []);
 
+  const handleFilterChange = (newFilter) => {
+    setFilter(newFilter);
+    setVisibleCount(5);
+  };
+
   const handleTaskClick = (task) => {
     setSelectedTask(task);
   };
@@ -214,6 +220,23 @@ const AllTask = () => {
     return task[filter] === true;
   });
 
+  const sortedTasks = [...filteredTasks].sort(
+    (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+  );
+
+  const visibleTasks = sortedTasks.slice(0, visibleCount);
+  const hasMore = visibleCount < sortedTasks.length;
+  const isFullyExpanded =
+    visibleCount >= sortedTasks.length && sortedTasks.length > 5;
+
+  const handleShowMore = () => {
+    setVisibleCount((prev) => prev + 5);
+  };
+
+  const handleCollapse = () => {
+    setVisibleCount(5);
+  };
+
   if (tasksLoading && tasks.length === 0) {
     return (
       <div className="mt-8 mb-10">
@@ -229,16 +252,20 @@ const AllTask = () => {
       <div className="mt-8 mb-10">
         <div className="bg-[#262626] rounded-2xl border border-white/5 shadow-xl overflow-hidden">
           <div className="p-6 border-b border-white/5 flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <h3 className="text-xl font-bold text-white whitespace-nowrap">
-              Task Registry
-            </h3>
+            <div>
+              <h3 className="text-xl font-bold text-white whitespace-nowrap">
+                Task Registry
+              </h3>
+              <p className="text-sm text-gray-500 font-medium mt-1">
+                {sortedTasks.length} {filter === "All" ? "total" : filter} tasks
+              </p>
+            </div>
 
-            {/* Filter Buttons */}
             <div className="flex flex-wrap gap-2">
               {filterOptions.map((option) => (
                 <button
                   key={option.value}
-                  onClick={() => setFilter(option.value)}
+                  onClick={() => handleFilterChange(option.value)}
                   className={`px-4 py-2 rounded-xl text-[10px] font-black tracking-widest transition-all cursor-pointer ${
                     filter === option.value
                       ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20"
@@ -274,69 +301,102 @@ const AllTask = () => {
                     </td>
                   </tr>
                 ) : (
-                  [...filteredTasks]
-                    .sort(
-                      (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
-                    )
-                    .map((task) => (
-                      <tr
-                        key={task._id}
-                        onClick={() => handleTaskClick(task)}
-                        className="hover:bg-white/5 transition-colors group cursor-pointer"
-                      >
-                        <td className="px-6 py-4">
-                          <div
-                            className="font-bold text-slate-200 group-hover:text-emerald-400 transition-colors truncate max-w-[140px] sm:max-w-[250px]"
-                            title={task.title}
-                          >
-                            {task.title}
-                          </div>
-                          <div className="text-[11px] text-gray-500 line-clamp-1 font-medium mt-0.5 max-w-[200px]">
-                            {task.description}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-3">
-                            <div className="flex flex-col">
-                              <span className="text-slate-300 text-[13px] font-bold tracking-wider">
-                                {task.assignedTo?.fname}{" "}
-                                {task.assignedTo?.lname}
-                              </span>
-                              <span className="text-[9px] text-gray-500 font-bold tracking-tighter line-clamp-1">
-                                {task.assignedTo?.email}
-                              </span>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-2 text-gray-400">
-                            <svg
-                              className="w-3.5 h-3.5 opacity-50"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                              />
-                            </svg>
-                            <span className="text-xs font-bold font-mono tracking-tighter">
-                              {task.date}
+                  visibleTasks.map((task) => (
+                    <tr
+                      key={task._id}
+                      onClick={() => handleTaskClick(task)}
+                      className="hover:bg-white/5 transition-colors group cursor-pointer"
+                    >
+                      <td className="px-6 py-4">
+                        <div
+                          className="font-bold text-slate-200 group-hover:text-emerald-400 transition-colors truncate max-w-[140px] sm:max-w-[250px]"
+                          title={task.title}
+                        >
+                          {task.title}
+                        </div>
+                        <div className="text-[11px] text-gray-500 line-clamp-1 font-medium mt-0.5 max-w-[200px]">
+                          {task.description}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="flex flex-col">
+                            <span className="text-slate-300 text-[13px] font-bold tracking-wider">
+                              {task.assignedTo?.fname} {task.assignedTo?.lname}
+                            </span>
+                            <span className="text-[9px] text-gray-500 font-bold tracking-tighter line-clamp-1">
+                              {task.assignedTo?.email}
                             </span>
                           </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <StatusBadge task={task} />
-                        </td>
-                      </tr>
-                    ))
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-2 text-gray-400">
+                          <svg
+                            className="w-3.5 h-3.5 opacity-50"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                            />
+                          </svg>
+                          <span className="text-xs font-bold font-mono tracking-tighter">
+                            {task.date}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <StatusBadge task={task} />
+                      </td>
+                    </tr>
+                  ))
                 )}
               </tbody>
             </table>
           </div>
+
+          {hasMore && (
+            <div className="px-6 py-4 bg-[#1c1c1c]/30 border-t border-white/5 flex justify-center">
+              <button
+                onClick={handleShowMore}
+                className="px-6 py-3 bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-500 font-bold text-sm rounded-xl border border-emerald-500/20 hover:border-emerald-500/30 transition-all active:scale-95 flex items-center gap-2"
+              >
+                <span>Show More</span>
+                <span className="text-xs opacity-70">
+                  ({sortedTasks.length - visibleCount} remaining)
+                </span>
+              </button>
+            </div>
+          )}
+
+          {isFullyExpanded && (
+            <div className="px-6 py-4 bg-[#1c1c1c]/30 border-t border-white/5 flex justify-center">
+              <button
+                onClick={handleCollapse}
+                className="px-6 py-3 bg-gray-600/10 hover:bg-gray-600/20 text-gray-400 hover:text-gray-300 font-bold text-sm rounded-xl border border-gray-500/20 hover:border-gray-500/30 transition-all active:scale-95 flex items-center gap-2"
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 15l7-7 7 7"
+                  />
+                </svg>
+                <span>Collapse</span>
+              </button>
+            </div>
+          )}
         </div>
       </div>
 

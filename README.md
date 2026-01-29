@@ -1,16 +1,99 @@
-# React + Vite
+# ⚡ Quantum Task Management
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A premium, real-time task management ecosystem designed for high-performance teams. Built with a focus on **visual excellence**, **real-time synchronization**, and **seamless UX**.
 
-Currently, two official plugins are available:
+![Dashboard Preview](https://github.com/07HypeR/employee_task_management_app/raw/main/public/preview.png)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### 🛡️ Authentication
 
-## React Compiler
+Experience a sleek, modern entry point for your team.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+|                Login Screen                 |                Registration Screen                |
+| :-----------------------------------------: | :-----------------------------------------------: |
+| ![Login Page](public/screenshots/login.png) | ![Register Page](public/screenshots/register.png) |
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## ✨ Features
+
+### 👔 Administrator Portal
+
+- **Centralized Task Control**: Create and assign tasks with metadata.
+- **Live Task Registry**: Real-time monitoring of every task.
+- **Smart Filtering**: Instant filtering by status (New, Active, Declined, Failed, Completed).
+- **Dynamic Pagination**: Intelligent "Show More" system to handle large task volumes without performance lag.
+
+![Admin Dashboard](public/screenshots/admin_dashboard.png)
+
+### 👥 Employee Portal
+
+- **Interactive Workload**: Respond to assignments in real-time.
+- **Status Progression**: Update active tasks to 'Completed' or 'Failed' as work progresses.
+- **Personalized Analytics**: Visual task statistics (Total, Pending, Completed, etc.).
+- **Archive System**: Track your progress and history.
+
+![Employee Dashboard](public/screenshots/employee_dashboard.png)
+
+### 🚀 Core Technology
+
+- **Engine**: React 18 + Vite (Ultra-fast HMR)
+- **Real-time**: Socket.io for instant cross-device synchronization.
+- **Styling**: Modern CSS with Glassmorphism and Backdrop Blur effects.
+- **Architecture**: Modular component-based design for scalability.
+
+## 🛠️ Performance & UX Optimizations
+
+### 🔄 Real-time Synchronization
+
+The app leverages **WebSockets** to ensure that when an Admin assigns a task, it appears on the Employee's dashboard instantly without a page refresh.
+
+### 📑 Smart Pagination System
+
+To maintain a clean UI and optimize network traffic:
+
+- **Initial Load**: Shows only the 5 latest activities.
+- **Load More**: Seamlessly fetches next 5 items.
+- **Collapse**: Revert to a compact view whenever needed.
+- **Zero-Latency Filtering**: Status filters reset pagination state for a predictable experience.
+
+### 🛡️ Secure Access
+
+- **Dual Authentication**: Role-based access control (Admin vs. Employee).
+- **Persistent State**: Automatic session recovery and state management.
+
+## 📂 Project Structure
+
+```bash
+src/
+├── components/        # Shared UI components (Layout, Header)
+├── features/          # Domain-specific logic
+│   ├── auth/          # Login & Registration flows
+│   ├── dashboard/     # Role-based dashboard layouts
+│   └── tasks/         # Task cards, forms, and registry
+├── hooks/             # Custom API & Socket hooks
+├── services/          # API & WebSocket configuration
+└── main.jsx           # Application entry point
+```
+
+## 🚀 Getting Started
+
+1. **Clone the repository**
+
+   ```bash
+   git clone https://github.com/07HypeR/employee_task_management_app.git
+   ```
+
+2. **Install dependencies**
+
+   ```bash
+   npm install
+   ```
+
+3. **Start Development Server**
+   ```bash
+   npm run dev
+   ```
+
+---
+
+_Built with ❤️ for Modern Teams_
