@@ -4,7 +4,6 @@ import { EmployeeDashboard, AdminDashboard } from "@features/dashboard";
 import { useAuth } from "@hooks/useApi";
 import { useSocket } from "@hooks/useSocket";
 import SocketStatus from "@components/SocketStatus";
-import SocketDebugPanel from "@components/SocketDebugPanel";
 import { Routes, Route, Navigate } from "react-router-dom";
 import TaskPage from "./pages/TaskPage";
 import AdminEmployeeTasksPage from "./pages/AdminEmployeeTasksPage";
@@ -12,7 +11,6 @@ import AdminEmployeeTasksPage from "./pages/AdminEmployeeTasksPage";
 const App = () => {
   const { user, authLoading, login, logout, initAuth } = useAuth();
 
-  // Initialize WebSocket connection when user is authenticated
   useSocket(user);
 
   useEffect(() => {
@@ -86,11 +84,7 @@ const App = () => {
         <Route path="/register" element={<RegisterForm />} />
       </Routes>
 
-      {/* WebSocket Connection Status Indicator */}
       {user && <SocketStatus />}
-
-      {/* WebSocket Debug Panel - Remove this after testing */}
-      {user && <SocketDebugPanel />}
     </>
   );
 };

@@ -8,30 +8,21 @@ const TaskCard = ({ task, onUpdate }) => {
 
   const handleStatusUpdate = async (action) => {
     try {
-      console.log(
-        `🔄 TaskCard: Updating task ${task._id} with action: ${action}`,
-      );
       setLoadingAction(action);
-      setError(null); // Clear previous errors
+      setError(null);
 
       const result = await updateTaskStatus(task._id, action);
 
-      console.log(`✅ TaskCard: Update result:`, result);
-
       if (result.success) {
-        console.log(`✅ TaskCard: Task ${task._id} updated successfully`);
         if (onUpdate) {
           onUpdate();
         }
       } else {
-        console.error(`❌ TaskCard: Update failed:`, result.error);
         setError(result.error || "Failed to update task");
       }
     } catch (error) {
-      console.error("❌ TaskCard: Exception during update:", error);
       setError(error.message || "An unexpected error occurred");
     } finally {
-      console.log(`🏁 TaskCard: Clearing loading state`);
       setLoadingAction(null);
     }
   };

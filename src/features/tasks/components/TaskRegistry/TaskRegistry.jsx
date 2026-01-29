@@ -150,7 +150,7 @@ const AllTask = () => {
   const [selectedTask, setSelectedTask] = useState(null);
   const [filter, setFilter] = useState("All");
   const fetchDebounceTimerRef = useRef(null);
-  const fetchTasksRef = useRef(fetchTasks); // Store fetchTasks in ref
+  const fetchTasksRef = useRef(fetchTasks);
 
   const filterOptions = [
     { label: "All", value: "All" },
@@ -161,7 +161,6 @@ const AllTask = () => {
     { label: "Completed", value: "completed" },
   ];
 
-  // Update ref when fetchTasks changes
   useEffect(() => {
     fetchTasksRef.current = fetchTasks;
   }, [fetchTasks]);
@@ -169,33 +168,27 @@ const AllTask = () => {
   useEffect(() => {
     fetchTasksRef.current();
 
-    // Debounced fetch that uses ref
     const debouncedFetchTasks = () => {
       if (fetchDebounceTimerRef.current) {
         clearTimeout(fetchDebounceTimerRef.current);
       }
 
       fetchDebounceTimerRef.current = setTimeout(() => {
-        console.log("⏰ Registry: Debounced fetch executing...");
-        fetchTasksRef.current(); // Use ref instead of direct fetchTasks
+        fetchTasksRef.current();
       }, 300);
     };
 
-    // Listen for real-time task updates
     const handleTaskCreated = (task) => {
-      console.log("🆕 Registry: New task created:", task);
       debouncedFetchTasks();
     };
 
     const handleTaskUpdated = (task) => {
-      console.log("📝 Registry: Task updated:", task);
       debouncedFetchTasks();
     };
 
     socketService.onTaskCreated(handleTaskCreated);
     socketService.onTaskUpdated(handleTaskUpdated);
 
-    // Cleanup listeners on unmount
     return () => {
       if (fetchDebounceTimerRef.current) {
         clearTimeout(fetchDebounceTimerRef.current);
@@ -203,7 +196,7 @@ const AllTask = () => {
       socketService.off("taskCreated", handleTaskCreated);
       socketService.off("taskUpdated", handleTaskUpdated);
     };
-  }, []); // Empty dependency array - runs once on mount
+  }, []);
 
   const handleTaskClick = (task) => {
     setSelectedTask(task);

@@ -119,19 +119,10 @@ export const useTasks = () => {
 
   const updateTaskStatus = async (taskId, action) => {
     try {
-      console.log(`🔄 Updating task ${taskId} with action: ${action}`);
-
-      // Make API call (no optimistic update to avoid conflicts with WebSocket)
       const updatedTask = await tasksAPI.updateStatus(taskId, action);
-
-      console.log(`✅ Task ${taskId} updated successfully`, updatedTask);
-
-      // Update local state with server response
       updateTask(taskId, updatedTask);
-
       return { success: true, data: updatedTask };
     } catch (error) {
-      console.error(`❌ Failed to update task ${taskId}:`, error);
       return { success: false, error: error.message };
     }
   };

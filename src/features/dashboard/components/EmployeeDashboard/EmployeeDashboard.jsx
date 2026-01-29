@@ -8,84 +8,49 @@ const EmployeeDashboard = ({ data, changeUser }) => {
   const { tasks, tasksLoading, fetchTasks } = useTasks();
   const userId = data?._id;
   const fetchDebounceTimerRef = useRef(null);
-  const fetchTasksRef = useRef(fetchTasks); // Store fetchTasks in ref
+  const fetchTasksRef = useRef(fetchTasks);
 
-  // Update ref when fetchTasks changes
   useEffect(() => {
     fetchTasksRef.current = fetchTasks;
   }, [fetchTasks]);
 
   useEffect(() => {
-    console.log(
-      "🏠 EmployeeDashboard: Setting up socket listeners for user:",
-      userId,
-    );
-
-    // Fetch tasks only once on mount
     fetchTasksRef.current();
 
-    // Debounced fetch that uses ref
     const debouncedFetchTasks = () => {
       if (fetchDebounceTimerRef.current) {
         clearTimeout(fetchDebounceTimerRef.current);
       }
 
       fetchDebounceTimerRef.current = setTimeout(() => {
-        console.log("⏰ Debounced fetch executing...");
-        fetchTasksRef.current(); // Use ref instead of direct fetchTasks
+        fetchTasksRef.current();
       }, 300);
     };
 
-    // Listen for real-time task updates
     const handleTaskCreated = (task) => {
-      console.log("🆕 EmployeeDashboard: New task created:", task);
-      console.log(
-        "🔍 Checking if task is for user:",
-        userId,
-        "Task assigned to:",
-        task.assignedTo?._id,
-      );
-
       if (userId && task.assignedTo?._id === userId) {
-        console.log("✅ Task is for this user, refreshing tasks...");
         debouncedFetchTasks();
-      } else {
-        console.log("⏭️ Task not for this user, skipping refresh");
       }
     };
 
     const handleTaskUpdated = (task) => {
-      console.log("📝 EmployeeDashboard: Task updated:", task);
-      console.log(
-        "🔍 Checking if task belongs to user:",
-        userId,
-        "Task assigned to:",
-        task.assignedTo?._id,
-      );
-
       if (userId && task.assignedTo?._id === userId) {
-        console.log("✅ Task belongs to this user, refreshing tasks...");
         debouncedFetchTasks();
-      } else {
-        console.log("⏭️ Task not for this user, skipping refresh");
       }
     };
 
     socketService.onTaskCreated(handleTaskCreated);
     socketService.onTaskUpdated(handleTaskUpdated);
 
-    // Cleanup listeners on unmount
     return () => {
-      console.log("🧹 EmployeeDashboard: Cleaning up socket listeners");
       if (fetchDebounceTimerRef.current) {
         clearTimeout(fetchDebounceTimerRef.current);
       }
       socketService.off("taskCreated", handleTaskCreated);
       socketService.off("taskUpdated", handleTaskUpdated);
     };
-  }, [userId]); // ONLY userId - no functions!
+  }, [userId]);
 
-  // Calculate task counts only when tasks array changes
   const taskCounts = useMemo(() => {
     return {
       newTask: tasks.filter((t) => t.newTask).length,
@@ -96,7 +61,6 @@ const EmployeeDashboard = ({ data, changeUser }) => {
     };
   }, [tasks]);
 
-  // Prepare data object for child components
   const dashboardData = useMemo(
     () => ({
       ...data,
@@ -109,14 +73,15 @@ const EmployeeDashboard = ({ data, changeUser }) => {
   if (tasksLoading && tasks.length === 0) {
     return (
       <div className="min-h-screen bg-[#1c1c1c] flex items-center justify-center">
-        <div className="text-emerald-500 text-xl">Loading tasks...</div>
+        <div className="text-emerald-500 text-xl font-bold animate-pulse">
+          Loading Tasks...
+        </div>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-[#1c1c1c] p-4 sm:p-10 relative overflow-hidden selection:bg-emerald-500/30">
-      {/* Background Atmosphere */}
       <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-emerald-600/5 blur-[120px] rounded-full" />
       <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-500/5 blur-[120px] rounded-full" />
 
