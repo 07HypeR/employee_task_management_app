@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useTasks, useAuth } from "@hooks/useApi";
 import { Header } from "@components/layout";
 import { TaskCard } from "@features/tasks";
+import socketService from "@services/socket";
 
 const TaskPage = ({ changeUser }) => {
   const { type } = useParams();
@@ -13,7 +14,36 @@ const TaskPage = ({ changeUser }) => {
 
   useEffect(() => {
     fetchTasks();
-  }, []);
+
+    // Listen for real-time task updates
+    const handleTaskCreated = (task) => {
+      console.log("🆕 New task created:", task);
+      // Check if this task is assigned to current user
+      if (user && task.assignedTo?._id === user._id) {
+        fetchTasks(); // Refresh tasks
+      }
+    };
+
+    const handleTaskUpdated = (task) => {
+      console.log("📝 Task updated:", task);
+      // Check if this task belongs to current user
+      if (
+        user &&
+        (task.assignedTo?._id === user._id || task.assignedBy?._id === user._id)
+      ) {
+        fetchTasks(); // Refresh tasks
+      }
+    };
+
+    socketService.onTaskCreated(handleTaskCreated);
+    socketService.onTaskUpdated(handleTaskUpdated);
+
+    // Cleanup listeners on unmount
+    return () => {
+      socketService.off("taskCreated", handleTaskCreated);
+      socketService.off("taskUpdated", handleTaskUpdated);
+    };
+  }, [user]);
 
   useEffect(() => {
     setFilteredTasks(getFilteredTasks(allTasks));

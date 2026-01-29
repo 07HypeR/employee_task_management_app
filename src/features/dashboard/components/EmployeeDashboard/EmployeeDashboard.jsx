@@ -2,6 +2,7 @@ import React, { useEffect, useMemo } from "react";
 import { Header, TaskStatistics } from "@components/layout";
 import { TaskList, TaskHistory } from "@features/tasks";
 import { useTasks } from "@hooks/useApi";
+import socketService from "@services/socket";
 
 const EmployeeDashboard = ({ data, changeUser }) => {
   const { tasks, tasksLoading, fetchTasks } = useTasks();
@@ -9,7 +10,33 @@ const EmployeeDashboard = ({ data, changeUser }) => {
   useEffect(() => {
     // Fetch tasks only once on mount
     fetchTasks();
-  }, []);
+
+    // Listen for real-time task updates
+    const handleTaskCreated = (task) => {
+      console.log("🆕 Dashboard: New task created:", task);
+      // Check if this task is assigned to current user
+      if (data && task.assignedTo?._id === data._id) {
+        fetchTasks(); // Refresh tasks
+      }
+    };
+
+    const handleTaskUpdated = (task) => {
+      console.log("📝 Dashboard: Task updated:", task);
+      // Check if this task belongs to current user
+      if (data && task.assignedTo?._id === data._id) {
+        fetchTasks(); // Refresh tasks
+      }
+    };
+
+    socketService.onTaskCreated(handleTaskCreated);
+    socketService.onTaskUpdated(handleTaskUpdated);
+
+    // Cleanup listeners on unmount
+    return () => {
+      socketService.off("taskCreated", handleTaskCreated);
+      socketService.off("taskUpdated", handleTaskUpdated);
+    };
+  }, [data]);
 
   // Calculate task counts only when tasks array changes
   const taskCounts = useMemo(() => {

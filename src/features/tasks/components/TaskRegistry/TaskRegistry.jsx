@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTasks } from "@hooks/useApi";
+import socketService from "@services/socket";
 
 const StatusBadge = ({ task }) => {
   if (task.completed) {
@@ -160,6 +161,26 @@ const AllTask = () => {
 
   useEffect(() => {
     fetchTasks();
+
+    // Listen for real-time task updates
+    const handleTaskCreated = (task) => {
+      console.log("🆕 Registry: New task created:", task);
+      fetchTasks(); // Refresh tasks
+    };
+
+    const handleTaskUpdated = (task) => {
+      console.log("📝 Registry: Task updated:", task);
+      fetchTasks(); // Refresh tasks
+    };
+
+    socketService.onTaskCreated(handleTaskCreated);
+    socketService.onTaskUpdated(handleTaskUpdated);
+
+    // Cleanup listeners on unmount
+    return () => {
+      socketService.off("taskCreated", handleTaskCreated);
+      socketService.off("taskUpdated", handleTaskUpdated);
+    };
   }, []);
 
   const handleTaskClick = (task) => {
