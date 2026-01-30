@@ -74,8 +74,9 @@ const TaskCard = ({ task, onUpdate }) => {
   const status = getStatusInfo();
 
   return (
-    <div
+    <article
       className={`p-6 rounded-3xl border transition-all duration-300 flex flex-col h-full bg-[#1c1c1c]/80 backdrop-blur-xl hover:bg-[#1c1c1c] ${status.border} shadow-lg`}
+      aria-label={`Task: ${task.title}`}
     >
       <div className="flex justify-between items-center mb-4">
         <span
@@ -102,7 +103,11 @@ const TaskCard = ({ task, onUpdate }) => {
 
       {/* Error Message */}
       {error && (
-        <div className="mb-4 p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl">
+        <div
+          className="mb-4 p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl"
+          role="alert"
+          aria-live="assertive"
+        >
           <p className="text-rose-500 text-xs font-medium">{error}</p>
         </div>
       )}
@@ -111,6 +116,7 @@ const TaskCard = ({ task, onUpdate }) => {
         {task.assignedBy && (
           <div className="flex items-center gap-2 pt-4 border-t border-white/5">
             <div
+              aria-hidden="true"
               className={`w-6 h-6 rounded-full flex items-center justify-center border ${status.border} ${status.bg}`}
             >
               <span className={`text-[10px] font-black ${status.color}`}>
@@ -133,6 +139,8 @@ const TaskCard = ({ task, onUpdate }) => {
                 disabled={!!loadingAction}
                 onClick={() => handleStatusUpdate("accept")}
                 className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold py-2.5 rounded-xl transition-all active:scale-95 shadow-lg shadow-emerald-600/20 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-wait"
+                aria-label="Accept this task"
+                aria-busy={loadingAction === "accept"}
               >
                 {loadingAction === "accept" ? (
                   <svg
@@ -140,6 +148,8 @@ const TaskCard = ({ task, onUpdate }) => {
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
+                    role="img"
+                    aria-label="Loading"
                   >
                     <circle
                       className="opacity-25"
@@ -163,6 +173,8 @@ const TaskCard = ({ task, onUpdate }) => {
                 disabled={!!loadingAction}
                 onClick={() => handleStatusUpdate("decline")}
                 className="px-4 bg-white/5 hover:bg-white/10 text-gray-400 text-xs font-bold py-2.5 rounded-xl border border-white/5 transition-all cursor-pointer flex items-center justify-center disabled:opacity-70 disabled:cursor-wait"
+                aria-label="Decline this task"
+                aria-busy={loadingAction === "decline"}
               >
                 {loadingAction === "decline" ? (
                   <svg
@@ -170,6 +182,8 @@ const TaskCard = ({ task, onUpdate }) => {
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
+                    role="img"
+                    aria-label="Loading"
                   >
                     <circle
                       className="opacity-25"
@@ -197,6 +211,8 @@ const TaskCard = ({ task, onUpdate }) => {
                 disabled={!!loadingAction}
                 onClick={() => handleStatusUpdate("complete")}
                 className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold py-2.5 rounded-xl transition-all active:scale-95 shadow-lg shadow-emerald-600/20 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-wait"
+                aria-label="Mark task as complete"
+                aria-busy={loadingAction === "complete"}
               >
                 {loadingAction === "complete" ? (
                   <svg
@@ -204,6 +220,8 @@ const TaskCard = ({ task, onUpdate }) => {
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
+                    role="img"
+                    aria-label="Loading"
                   >
                     <circle
                       className="opacity-25"
@@ -227,6 +245,8 @@ const TaskCard = ({ task, onUpdate }) => {
                 disabled={!!loadingAction}
                 onClick={() => handleStatusUpdate("fail")}
                 className="flex-1 bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 text-xs font-bold py-2.5 rounded-xl border border-rose-500/10 transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-wait"
+                aria-label="Mark task as failed"
+                aria-busy={loadingAction === "fail"}
               >
                 {loadingAction === "fail" ? (
                   <svg
@@ -234,6 +254,8 @@ const TaskCard = ({ task, onUpdate }) => {
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
+                    role="img"
+                    aria-label="Loading"
                   >
                     <circle
                       className="opacity-25"
@@ -257,7 +279,7 @@ const TaskCard = ({ task, onUpdate }) => {
           )}
         </div>
       </div>
-    </div>
+    </article>
   );
 };
 

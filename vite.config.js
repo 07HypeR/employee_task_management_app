@@ -20,4 +20,30 @@ export default defineConfig({
       "@assets": path.resolve(__dirname, "./src/assets"),
     },
   },
+  build: {
+    // Enable minification for better performance
+    minify: "terser",
+    terserOptions: {
+      compress: {
+        drop_console: true, // Remove console.logs in production
+        drop_debugger: true,
+      },
+    },
+    // Optimize chunk splitting
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ["react", "react-dom", "react-router-dom"],
+        },
+      },
+    },
+    // Chunk size warnings
+    chunkSizeWarningLimit: 1000,
+    // Source maps for debugging (disable in production for performance)
+    sourcemap: false,
+  },
+  // Performance optimizations
+  optimizeDeps: {
+    include: ["react", "react-dom", "react-router-dom"],
+  },
 });

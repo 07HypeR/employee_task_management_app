@@ -7,7 +7,7 @@ const Header = ({ data, changeUser }) => {
   };
 
   return (
-    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 sm:p-8 bg-[#111111]/60 backdrop-blur-2xl rounded-[2rem] sm:rounded-3xl mb-8 sm:mb-10 border border-emerald-500/10 hover:border-emerald-500/20 hover:bg-[#111111]/80 transition-all duration-300 gap-6 sm:gap-0">
+    <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 sm:p-8 bg-[#111111]/60 backdrop-blur-2xl rounded-[2rem] sm:rounded-3xl mb-8 sm:mb-10 border border-emerald-500/10 hover:border-emerald-500/20 hover:bg-[#111111]/80 transition-all duration-300 gap-6 sm:gap-0">
       <div className="flex flex-col gap-1">
         <h1 className="text-[10px] sm:text-xs font-bold text-emerald-500 uppercase tracking-[0.2em]">
           Task Management
@@ -23,10 +23,11 @@ const Header = ({ data, changeUser }) => {
       <button
         onClick={logOutUser}
         className="w-full sm:w-auto px-8 py-3 rounded-2xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 text-sm font-bold transition-all duration-300 border border-rose-500/20 hover:border-rose-500/40 cursor-pointer"
+        aria-label="Sign out of your account"
       >
         Sign Out
       </button>
-    </div>
+    </header>
   );
 };
 

@@ -89,9 +89,7 @@ const TaskCard = ({ data }) => {
           </span>
         </div>
         <div className="flex items-center gap-1.5">
-          <div
-            className={`w-1.5 h-1.5 rounded-full animate-pulse ${status.dotColor}`}
-          />
+          <div className={`w-1.5 h-1.5 rounded-full ${status.dotColor}`} />
           <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest leading-none">
             {status.trackingText}
           </span>
@@ -147,7 +145,7 @@ const AdminEmployeeTasks = ({ changeUser }) => {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#1c1c1c] flex items-center justify-center">
-        <div className="text-emerald-500 text-xl font-bold animate-pulse">
+        <div className="text-emerald-500 text-xl font-bold">
           Loading tasks...
         </div>
       </div>

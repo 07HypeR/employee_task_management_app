@@ -1,0 +1,21 @@
+{
+  "name": "Employee Task Management System",
+  "short_name": "TaskManager",
+  "description": "Professional employee task management platform for teams",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1c1c1c",
+  "theme_color": "#10b981",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/task.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "business"],
+  "lang": "en-US",
+  "dir": "ltr"
+}

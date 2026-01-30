@@ -73,7 +73,11 @@ const EmployeeDashboard = ({ data, changeUser }) => {
   if (tasksLoading && tasks.length === 0) {
     return (
       <div className="min-h-screen bg-[#1c1c1c] flex items-center justify-center">
-        <div className="text-emerald-500 text-xl font-bold animate-pulse">
+        <div
+          className="text-emerald-500 text-xl font-bold"
+          role="status"
+          aria-live="polite"
+        >
           Loading Tasks...
         </div>
       </div>
@@ -82,15 +86,21 @@ const EmployeeDashboard = ({ data, changeUser }) => {
 
   return (
     <div className="min-h-screen bg-[#1c1c1c] p-4 sm:p-10 relative overflow-hidden selection:bg-emerald-500/30">
-      <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-emerald-600/5 blur-[120px] rounded-full" />
-      <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-500/5 blur-[120px] rounded-full" />
+      <div
+        aria-hidden="true"
+        className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-emerald-600/5 blur-[120px] rounded-full"
+      />
+      <div
+        aria-hidden="true"
+        className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-500/5 blur-[120px] rounded-full"
+      />
 
-      <div className="relative z-10 max-w-7xl mx-auto">
+      <main className="relative z-10 max-w-7xl mx-auto">
         <Header data={dashboardData} changeUser={changeUser} />
         <TaskStatistics data={dashboardData} />
         <TaskList data={dashboardData} />
         <TaskHistory data={dashboardData} />
-      </div>
+      </main>
     </div>
   );
 };

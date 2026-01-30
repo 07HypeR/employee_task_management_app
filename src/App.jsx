@@ -24,7 +24,13 @@ const App = () => {
   if (authLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-[#1c1c1c]">
-        <div className="text-emerald-500 text-xl">Loading...</div>
+        <div
+          className="text-emerald-500 text-xl"
+          role="status"
+          aria-live="polite"
+        >
+          Loading...
+        </div>
       </div>
     );
   }

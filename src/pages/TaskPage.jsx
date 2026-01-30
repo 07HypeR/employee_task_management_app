@@ -86,7 +86,11 @@ const TaskPage = ({ changeUser }) => {
   if (tasksLoading && filteredTasks.length === 0) {
     return (
       <div className="min-h-screen bg-[#1c1c1c] flex items-center justify-center">
-        <div className="text-emerald-500 text-xl font-bold animate-pulse">
+        <div
+          className="text-emerald-500 text-xl font-bold"
+          role="status"
+          aria-live="polite"
+        >
           Loading Tasks...
         </div>
       </div>
@@ -96,10 +100,16 @@ const TaskPage = ({ changeUser }) => {
   return (
     <div className="min-h-screen bg-[#1c1c1c] p-4 sm:p-10 relative overflow-hidden selection:bg-emerald-500/30">
       {/* Background Atmosphere */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-600/5 blur-[120px] rounded-full pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-emerald-500/5 blur-[120px] rounded-full pointer-events-none" />
+      <div
+        aria-hidden="true"
+        className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-600/5 blur-[120px] rounded-full pointer-events-none"
+      />
+      <div
+        aria-hidden="true"
+        className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-emerald-500/5 blur-[120px] rounded-full pointer-events-none"
+      />
 
-      <div className="relative z-10 max-w-7xl mx-auto">
+      <main className="relative z-10 max-w-7xl mx-auto">
         <Header data={user} changeUser={changeUser} />
 
         <div className="mt-8 mb-12 flex flex-col sm:flex-row sm:items-center gap-6">
@@ -107,12 +117,15 @@ const TaskPage = ({ changeUser }) => {
             <button
               onClick={() => navigate("/")}
               className="group p-3 rounded-2xl bg-white/5 hover:bg-emerald-500/10 border border-white/5 hover:border-emerald-500/20 transition-all duration-300 cursor-pointer"
+              aria-label="Go back to dashboard"
             >
               <svg
                 className="w-6 h-6 text-slate-400 group-hover:text-emerald-500 transition-colors"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
+                role="img"
+                aria-label="Back arrow icon"
               >
                 <path
                   strokeLinecap="round"
@@ -132,8 +145,15 @@ const TaskPage = ({ changeUser }) => {
             </div>
           </div>
 
-          <div className="sm:ml-auto w-fit flex items-center gap-3 bg-emerald-500/10 backdrop-blur-2xl px-5 py-2.5 rounded-2xl border border-emerald-500/10 shadow-lg shadow-emerald-500/5">
-            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          <div
+            className="sm:ml-auto w-fit flex items-center gap-3 bg-emerald-500/10 backdrop-blur-2xl px-5 py-2.5 rounded-2xl border border-emerald-500/10 shadow-lg shadow-emerald-500/5"
+            role="status"
+            aria-live="polite"
+          >
+            <div
+              aria-hidden="true"
+              className="w-2 h-2 rounded-full bg-emerald-500"
+            />
             <span className="text-xs text-emerald-500 font-black uppercase tracking-widest">
               {filteredTasks.length}{" "}
               {filteredTasks.length === 1 ? "Assignment" : "Assignments"}
@@ -143,7 +163,10 @@ const TaskPage = ({ changeUser }) => {
 
         {filteredTasks.length === 0 ? (
           <div className="bg-[#111111]/40 backdrop-blur-2xl py-24 rounded-[3rem] border border-white/5 text-center shadow-2xl">
-            <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6 border border-white/5">
+            <div
+              aria-hidden="true"
+              className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6 border border-white/5"
+            >
               <span className="text-4xl opacity-40">📬</span>
             </div>
             <h3 className="text-white text-xl font-bold mb-2">
@@ -166,7 +189,7 @@ const TaskPage = ({ changeUser }) => {
             ))}
           </div>
         )}
-      </div>
+      </main>
     </div>
   );
 };

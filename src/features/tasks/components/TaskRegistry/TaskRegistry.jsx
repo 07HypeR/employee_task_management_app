@@ -256,7 +256,7 @@ const AllTask = () => {
               <h3 className="text-xl font-bold text-white whitespace-nowrap">
                 Task Registry
               </h3>
-              <p className="text-sm text-gray-500 font-medium mt-1">
+              <p className="text-sm text-gray-400 font-medium mt-1">
                 {sortedTasks.length} {filter === "All" ? "total" : filter} tasks
               </p>
             </div>
@@ -293,7 +293,7 @@ const AllTask = () => {
                   <tr>
                     <td
                       colSpan={4}
-                      className="px-6 py-12 text-center text-gray-500 font-medium"
+                      className="px-6 py-12 text-center text-gray-400 font-medium"
                     >
                       {filter === "All"
                         ? "No tasks assigned yet."
@@ -314,7 +314,7 @@ const AllTask = () => {
                         >
                           {task.title}
                         </div>
-                        <div className="text-[11px] text-gray-500 line-clamp-1 font-medium mt-0.5 max-w-[200px]">
+                        <div className="text-[11px] text-gray-400 line-clamp-1 font-medium mt-0.5 max-w-[200px]">
                           {task.description}
                         </div>
                       </td>
@@ -324,7 +324,7 @@ const AllTask = () => {
                             <span className="text-slate-300 text-[13px] font-bold tracking-wider">
                               {task.assignedTo?.fname} {task.assignedTo?.lname}
                             </span>
-                            <span className="text-[9px] text-gray-500 font-bold tracking-tighter line-clamp-1">
+                            <span className="text-[9px] text-gray-400 font-bold tracking-tighter line-clamp-1">
                               {task.assignedTo?.email}
                             </span>
                           </div>
@@ -367,7 +367,7 @@ const AllTask = () => {
                 className="px-6 py-3 bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-500 font-bold text-sm rounded-xl border border-emerald-500/20 hover:border-emerald-500/30 transition-all active:scale-95 flex items-center gap-2"
               >
                 <span>Show More</span>
-                <span className="text-xs opacity-70">
+                <span className="text-xs text-emerald-400">
                   ({sortedTasks.length - visibleCount} remaining)
                 </span>
               </button>

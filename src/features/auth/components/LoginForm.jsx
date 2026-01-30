@@ -46,12 +46,21 @@ const Login = ({ handleLogin }) => {
   return (
     <div className="flex flex-col min-h-screen w-screen items-center justify-center bg-[#1c1c1c] relative overflow-y-auto overflow-x-hidden py-10 px-4 sm:px-0 scroll-smooth">
       {/* Background Atmosphere */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-600/10 blur-[120px] rounded-full pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-emerald-500/5 blur-[120px] rounded-full pointer-events-none" />
+      <div
+        aria-hidden="true"
+        className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-600/10 blur-[120px] rounded-full pointer-events-none"
+      />
+      <div
+        aria-hidden="true"
+        className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-emerald-500/5 blur-[120px] rounded-full pointer-events-none"
+      />
 
       <div className="relative z-10 w-full max-w-md px-4 sm:px-6">
         <div className="bg-[#111111]/80 backdrop-blur-2xl rounded-[2rem] sm:rounded-[2.5rem] border border-emerald-500/10 p-8 sm:p-10 shadow-2xl overflow-hidden group hover:border-emerald-500/20 transition-all duration-500">
-          <div className="absolute top-0 right-0 w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-emerald-500/10 to-transparent blur-3xl -mr-12 -mt-12 sm:-mr-16 sm:-mt-16 group-hover:opacity-100 opacity-50 transition-opacity duration-500" />
+          <div
+            aria-hidden="true"
+            className="absolute top-0 right-0 w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-emerald-500/10 to-transparent blur-3xl -mr-12 -mt-12 sm:-mr-16 sm:-mt-16 group-hover:opacity-100 opacity-50 transition-opacity duration-500"
+          />
 
           <div className="text-center mb-8 sm:mb-10">
             <h1 className="text-[10px] sm:text-xs font-bold text-emerald-500 uppercase tracking-[0.3em] mb-3">
@@ -69,9 +78,16 @@ const Login = ({ handleLogin }) => {
           </div>
 
           {error && (
-            <div className="mb-6 p-4 bg-rose-500/10 border border-rose-500/30 rounded-2xl animate-shake relative group/error">
+            <div
+              role="alert"
+              aria-live="assertive"
+              className="mb-6 p-4 bg-rose-500/10 border border-rose-500/30 rounded-2xl animate-shake relative group/error"
+            >
               <div className="flex items-center gap-3 pr-8">
-                <div className="w-8 h-8 rounded-full bg-rose-500/20 flex items-center justify-center shrink-0">
+                <div
+                  aria-hidden="true"
+                  className="w-8 h-8 rounded-full bg-rose-500/20 flex items-center justify-center shrink-0"
+                >
                   <span className="text-rose-500 text-lg">⚠</span>
                 </div>
                 <p className="text-rose-400 text-xs sm:text-sm font-semibold">
@@ -81,19 +97,30 @@ const Login = ({ handleLogin }) => {
               <button
                 onClick={() => setError("")}
                 className="absolute top-1/2 -translate-y-1/2 right-3 w-6 h-6 rounded-lg bg-rose-500/10 flex items-center justify-center text-rose-500 hover:bg-rose-500 hover:text-white transition-all duration-300 cursor-pointer"
-                title="Close"
+                aria-label="Close error message"
               >
-                <span className="text-lg leading-none">&times;</span>
+                <span aria-hidden="true" className="text-lg leading-none">
+                  &times;
+                </span>
               </button>
             </div>
           )}
 
-          <form onSubmit={submitHandler} className="flex flex-col gap-4">
+          <form
+            onSubmit={submitHandler}
+            className="flex flex-col gap-4"
+            aria-label="Login form"
+          >
             <div className="space-y-2">
-              <label className="text-[10px] font-bold text-emerald-500/60 uppercase tracking-widest ml-4">
+              <label
+                htmlFor="email-input"
+                className="text-[10px] font-bold text-emerald-500/60 uppercase tracking-widest ml-4"
+              >
                 Email Address
               </label>
               <input
+                id="email-input"
+                name="email"
                 value={email}
                 onChange={(e) => {
                   setEmail(e.target.value);
@@ -103,14 +130,21 @@ const Login = ({ handleLogin }) => {
                 className="w-full h-12 sm:h-14 outline-none bg-black/20 border border-emerald-500/10 text-white px-5 sm:px-6 rounded-xl sm:rounded-2xl placeholder:text-slate-600 focus:border-emerald-500/40 focus:bg-black/40 transition-all duration-300 text-sm sm:text-base"
                 type="email"
                 placeholder="email@example.com"
+                aria-required="true"
+                aria-invalid={error ? "true" : "false"}
               />
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-bold text-emerald-500/60 uppercase tracking-widest ml-4">
+              <label
+                htmlFor="password-input"
+                className="text-[10px] font-bold text-emerald-500/60 uppercase tracking-widest ml-4"
+              >
                 Password
               </label>
               <input
+                id="password-input"
+                name="password"
                 value={password}
                 onChange={(e) => {
                   setPassword(e.target.value);
@@ -120,12 +154,19 @@ const Login = ({ handleLogin }) => {
                 className="w-full h-12 sm:h-14 outline-none bg-black/20 border border-emerald-500/10 text-white px-5 sm:px-6 rounded-xl sm:rounded-2xl placeholder:text-slate-600 focus:border-emerald-500/40 focus:bg-black/40 transition-all duration-300 text-sm sm:text-base"
                 type="password"
                 placeholder="••••••••"
+                aria-required="true"
+                aria-invalid={error ? "true" : "false"}
               />
             </div>
 
             <button
+              type="submit"
               disabled={loading}
               className="mt-4 sm:mt-6 bg-emerald-600 hover:bg-emerald-500 text-white font-bold h-12 sm:h-14 px-6 rounded-xl sm:rounded-2xl transition-all duration-300 shadow-lg shadow-emerald-500/20 active:scale-[0.98] cursor-pointer text-sm sm:text-base flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-wait"
+              aria-busy={loading}
+              aria-label={
+                loading ? "Logging in, please wait" : "Log in to your account"
+              }
             >
               {loading ? (
                 <>
@@ -134,6 +175,8 @@ const Login = ({ handleLogin }) => {
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
+                    role="img"
+                    aria-label="Loading spinner"
                   >
                     <circle
                       className="opacity-25"

@@ -31,6 +31,8 @@ const CalendarIcon = () => (
     fill="none"
     stroke="currentColor"
     viewBox="0 0 24 24"
+    role="img"
+    aria-label="Calendar icon"
   >
     <path
       strokeLinecap="round"
@@ -45,11 +47,17 @@ const TaskDetailsModal = ({ task, onClose }) => {
   if (!task) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="task-details-title"
+    >
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
         onClick={onClose}
+        aria-hidden="true"
       />
 
       {/* Modal Content */}
@@ -60,19 +68,24 @@ const TaskDetailsModal = ({ task, onClose }) => {
               <span className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-500 text-[10px] font-black uppercase tracking-widest border border-emerald-500/20 mb-3 inline-block">
                 {task.category}
               </span>
-              <h3 className="text-2xl font-bold text-white leading-tight">
+              <h3
+                id="task-details-title"
+                className="text-2xl font-bold text-white leading-tight"
+              >
                 {task.title}
               </h3>
             </div>
             <button
               onClick={onClose}
               className="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 transition-colors text-gray-400 hover:text-white cursor-pointer"
+              aria-label="Close task details"
             >
               <svg
                 className="w-5 h-5"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
+                aria-hidden="true"
               >
                 <path
                   strokeLinecap="round"
@@ -159,13 +172,19 @@ const TaskHistory = ({ data }) => {
 
   return (
     <>
-      <section className="pb-12 ">
+      <section aria-labelledby="task-history-heading" className="pb-12 ">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-xl bg-gray-500/10 flex items-center justify-center text-gray-400 border border-white/5">
+          <div
+            aria-hidden="true"
+            className="w-10 h-10 rounded-xl bg-gray-500/10 flex items-center justify-center text-gray-400 border border-white/5"
+          >
             <CalendarIcon />
           </div>
           <div>
-            <h3 className="text-xl font-bold text-white leading-tight">
+            <h3
+              id="task-history-heading"
+              className="text-xl font-bold text-white leading-tight"
+            >
               Archived & Completed
             </h3>
             <p className="text-sm text-gray-500 font-medium">
@@ -190,7 +209,7 @@ const TaskHistory = ({ data }) => {
                   <tr>
                     <td
                       colSpan={4}
-                      className="px-6 py-12 text-center text-gray-500 italic font-medium"
+                      className="px-6 py-12 text-center text-gray-400 italic font-medium"
                     >
                       No history recorded yet.
                     </td>
@@ -201,6 +220,15 @@ const TaskHistory = ({ data }) => {
                       key={task._id || idx}
                       onClick={() => setSelectedTask(task)}
                       className="text-sm hover:bg-white/[0.02] transition-colors group cursor-pointer"
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          setSelectedTask(task);
+                        }
+                      }}
+                      aria-label={`View details for task: ${task.title}`}
                     >
                       <td className="px-6 py-4">
                         <div
@@ -209,13 +237,13 @@ const TaskHistory = ({ data }) => {
                         >
                           {task.title}
                         </div>
-                        <div className="text-[11px] text-gray-500 line-clamp-1 font-medium mt-0.5 max-w-[200px]">
+                        <div className="text-[11px] text-gray-400 line-clamp-1 font-medium mt-0.5 max-w-[200px]">
                           {task.description}
                         </div>
                       </td>
                       <td className="px-6 py-4">
                         <div
-                          className="text-gray-400 font-bold text-xs tracking-wider truncate max-w-[120px]"
+                          className="text-gray-300 font-bold text-xs tracking-wider truncate max-w-[120px]"
                           title={`${task.assignedBy?.fname} ${task.assignedBy?.lname}`}
                         >
                           {task.assignedBy?.fname} {task.assignedBy?.lname}
@@ -225,7 +253,7 @@ const TaskHistory = ({ data }) => {
                         <HistoryStatus task={task} />
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <span className="text-xs font-bold font-mono text-gray-500 tracking-tighter">
+                        <span className="text-xs font-bold font-mono text-gray-400 tracking-tighter">
                           {task.date}
                         </span>
                       </td>
@@ -241,9 +269,10 @@ const TaskHistory = ({ data }) => {
               <button
                 onClick={handleShowMore}
                 className="px-6 py-3 bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-500 font-bold text-sm rounded-xl border border-emerald-500/20 hover:border-emerald-500/30 transition-all active:scale-95 flex items-center gap-2"
+                aria-label={`Show more history, ${sortedHistory.length - visibleCount} remaining`}
               >
                 <span>Show More</span>
-                <span className="text-xs opacity-70">
+                <span className="text-xs text-emerald-400">
                   ({sortedHistory.length - visibleCount} remaining)
                 </span>
               </button>
@@ -255,12 +284,14 @@ const TaskHistory = ({ data }) => {
               <button
                 onClick={handleCollapse}
                 className="px-6 py-3 bg-gray-600/10 hover:bg-gray-600/20 text-gray-400 hover:text-gray-300 font-bold text-sm rounded-xl border border-gray-500/20 hover:border-gray-500/30 transition-all active:scale-95 flex items-center gap-2"
+                aria-label="Collapse history list"
               >
                 <svg
                   className="w-4 h-4"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
+                  aria-hidden="true"
                 >
                   <path
                     strokeLinecap="round"

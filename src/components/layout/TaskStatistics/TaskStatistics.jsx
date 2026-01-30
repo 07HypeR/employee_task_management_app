@@ -43,8 +43,10 @@ const TasklistNumber = ({ data }) => {
           key={idx}
           to={stat.path}
           className="bg-[#111111]/60 backdrop-blur-2xl p-6 relative overflow-hidden group rounded-3xl border border-emerald-500/10 hover:border-emerald-500/20 hover:bg-[#111111]/80 transition-all duration-300 block"
+          aria-label={`View ${stat.label}: ${stat.count} tasks`}
         >
           <div
+            aria-hidden="true"
             className={`absolute -right-4 -top-4 w-24 h-24 bg-gradient-to-br ${stat.gradient} opacity-[0.08] rounded-full blur-2xl group-hover:opacity-20 transition-opacity duration-500`}
           />
           <h2 className="text-3xl font-bold mb-1">{stat.count}</h2>
