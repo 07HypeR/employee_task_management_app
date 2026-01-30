@@ -51,6 +51,21 @@
     <link rel="icon" type="image/svg+xml" href="/task.svg" />
     <link rel="apple-touch-icon" href="/task.svg" />
     <link rel="manifest" href="/manifest.json" />
+
+    <!-- Hide Vercel Toolbar -->
+    <style>
+      /* Hide Vercel toolbar completely */
+      #__next-build-watcher,
+      #__vercel-toolbar,
+      iframe[src*="vercel.live"],
+      [data-vercel-toolbar],
+      vercel-live-feedback {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>
